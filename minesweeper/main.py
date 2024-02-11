@@ -8,7 +8,7 @@ def choose_difficulty():
         size = input("Choose size of an board: ")
         try:
             size = int(size)
-            if size < 40 and size > 5:
+            if size < 40 and size > 3:
                 is_int = True
             else:
                 print("Provide only integer number")
@@ -32,7 +32,6 @@ def print_end_board(board):
                 board_to_print[i][j] = '\u2691'
             if board_to_print[i][j] == 'm':
                 board_to_print[i][j] = '\u22BB'
-    os.system('cls')
     os.system('cls')
     max_row_width = len(str(len(board_to_print)))  
     row_numbers = ''
@@ -80,7 +79,7 @@ def print_board(board):
     print(horizontal_line)
 
 def create_board(size, x_cord, y_cord):
-    num_bombs = size * 2
+    num_bombs = size
     board = [['X'] * size for _ in range(size)]
     bombs_placed = 0
     while bombs_placed < num_bombs:
@@ -89,13 +88,13 @@ def create_board(size, x_cord, y_cord):
         if (x, y) != (x_cord - 1, y_cord - 1) and board[x][y] != 'B':
             board[x][y] = 'B'
             bombs_placed += 1
-        bombs_placed -= remove_bombs_nearby(board, x_cord, y_cord)
+        bombs_placed -= remove_bombs_nearby(board, x_cord - 1, y_cord - 1)
     return board
 
 def remove_bombs_nearby(board, x_cord, y_cord):
     counter = 0
-    for i in range(max(0, x_cord - 2), min(len(board), x_cord + 1)):
-        for j in range(max(0, y_cord - 2), min(len(board[0]), y_cord + 1)):
+    for i in range(max(0, x_cord - 1), min(len(board), x_cord + 2)):
+        for j in range(max(0, y_cord - 1), min(len(board[0]), y_cord + 2)):
             if board[i][j] == 'B':
                 board[i][j] = 'X'
                 counter += 1
@@ -140,7 +139,7 @@ def mark_bomb(board, x_cord, y_cord):
         board[x_cord - 1][y_cord - 1] = 'm'
 
 def check_for_bombs(board, x_cord, y_cord):
-    if board[x_cord - 1][y_cord - 1] == 'B':
+    if board[x_cord - 1][y_cord - 1] == 'B' or board[x_cord - 1][y_cord - 1] == 'M':
         board[x_cord - 1][y_cord - 1] = '\u25CB'
         print_end_board(board)
         exit('Game Over')
@@ -166,20 +165,22 @@ def check_win(board, board_size):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if board[i][j] == 'B':
-                return
-            if board[i][j] == 'X':
-                return
-    penalty_points = 0
-    max_score = board_size * board_size
+                return False
+    return True
+
+def end_game(board, board_size, score_max):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if board[i][j] == 'm':
-                penalty_points += 1
-    score = max_score - (penalty_points * 10) - 1
-    exit(f'U won!! Score number: {score}')
+                score_max = score_max - (score_max // (board_size * board_size))
+    if check_win(board, board_size):
+        print_end_board(board)
+        exit(f'U won with score {score_max}')
+    return score_max
 
 def main():
     board_size = choose_difficulty()
+    score_max = 999
     print_starting_board(board_size)
     x_cord, y_cord = player_moves(board_size)
     board = create_board(board_size, x_cord, y_cord)
@@ -187,6 +188,6 @@ def main():
     print_board(board)
     while True:
         choose_mode(board, board_size)
-        check_win(board, board_size)
+        score_max = end_game(board, board_size, score_max)
 
 main()
