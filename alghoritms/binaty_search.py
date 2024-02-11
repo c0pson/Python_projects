@@ -22,7 +22,7 @@ def binary_search(sorted_array, target):
             counter += 1
 
         else:
-            print(f'{target} found in {counter} stesps.\n')
+            print(f'{target} found in {counter} steps.\n')
             return middle_of_array
 
     print(f'Target {target} not found')
