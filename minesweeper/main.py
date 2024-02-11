@@ -1,4 +1,5 @@
 import random
+import time
 import copy
 import os
 
@@ -135,8 +136,11 @@ def player_moves(board_size):
 def mark_bomb(board, x_cord, y_cord):
     if board[x_cord - 1][y_cord - 1] == 'B':
         board[x_cord - 1][y_cord - 1] = 'M'
-    else:
+    elif board[x_cord - 1][x_cord - 1] == 'X':
         board[x_cord - 1][y_cord - 1] = 'm'
+    else:
+        print('U cant mark bomb in here!')
+        time.sleep(1)
 
 def check_for_bombs(board, x_cord, y_cord):
     if board[x_cord - 1][y_cord - 1] == 'B' or board[x_cord - 1][y_cord - 1] == 'M':
