@@ -195,7 +195,7 @@ def check_win(board):
             exit('Game over')
 
 def append_board(board):
-    elements_to_choose = [2, 2, 2, 2, 2, 2, 2, 4]
+    elements_to_choose = [2, 2, 2, 2, 2, 2, 2, 2, 4]
     correct = False
     while not correct:
         x = random.randrange(0, 4)
