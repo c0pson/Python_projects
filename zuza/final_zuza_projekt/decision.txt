@@ -1,0 +1,5 @@
+4
+paws < 3.0 human
+speed > 25.5 dog
+lifespan < 5.1 guineePig
+weight > 3.7 ratMutant
