@@ -236,11 +236,11 @@ def check_draw(check_board):
         exit()
 
 def main():
-    check_board = [[0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0],
-                   [0, 0, 0, 0, 0]]
+    check_board = [ [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0],
+                    [0, 0, 0, 0, 0]]
 
     print_check_board(check_board)
 
