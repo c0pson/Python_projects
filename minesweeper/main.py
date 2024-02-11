@@ -194,4 +194,5 @@ def main():
         choose_mode(board, board_size)
         score_max = end_game(board, board_size, score_max)
 
-main()
+if __name__ == "__main__":
+    main()

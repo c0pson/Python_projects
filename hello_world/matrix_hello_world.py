@@ -35,7 +35,6 @@ def shell_output_if_correct(passed_string):
     sys.stdout.write("\033[1G")
     sys.stdout.write(passed_string)
     sys.stdout.write('\n')
-    time.sleep(0.2)
 
 def main(sentence):
     result = [] * len(sentence)
