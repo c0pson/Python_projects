@@ -32,7 +32,6 @@ def print_end_board(board):
                 board_to_print[i][j] = '\u2691'
             if board_to_print[i][j] == 'm':
                 board_to_print[i][j] = '\u22BB'
-
     os.system('cls')
     os.system('cls')
     max_row_width = len(str(len(board_to_print)))  
@@ -90,17 +89,17 @@ def create_board(size, x_cord, y_cord):
         if (x, y) != (x_cord - 1, y_cord - 1) and board[x][y] != 'B':
             board[x][y] = 'B'
             bombs_placed += 1
-        if search_around_for_first_move(board, x_cord, y_cord):
-            board[x][y] = 'X'
-            bombs_placed -= 1
+        bombs_placed -= remove_bombs_nearby(board, x_cord, y_cord)
     return board
 
-def search_around_for_first_move(board, x_cord, y_cord):
-    for i in range(max(0, x_cord - 1), min(len(board), x_cord + 2)):
-        for j in range(max(0, y_cord - 1), min(len(board[0]), y_cord + 2)):
+def remove_bombs_nearby(board, x_cord, y_cord):
+    counter = 0
+    for i in range(max(0, x_cord - 2), min(len(board), x_cord + 1)):
+        for j in range(max(0, y_cord - 2), min(len(board[0]), y_cord + 1)):
             if board[i][j] == 'B':
-                return True
-    return False
+                board[i][j] = 'X'
+                counter += 1
+    return counter
 
 def choose_mode(board, board_size):
     mods = ['Select area', 'Pin bombs']
