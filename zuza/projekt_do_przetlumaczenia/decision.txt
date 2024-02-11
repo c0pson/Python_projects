@@ -1,3 +1,0 @@
-2
-height > 190.0 basketball
-jump <= 50.0 athletics
