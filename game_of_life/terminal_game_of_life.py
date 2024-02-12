@@ -3,34 +3,9 @@ import time
 import os
 
 # Any live cell with fewer than two live neighbors dies, as if by underpopulated.
-#
-# matrix = [[0,0,0,0],
-#           [0,1,1,0],
-#           [0,0,0,0],
-#           [0,0,0,0]] -- all of them will be dead
-#
 # Any live cell with two or three live neighbors lives on to the next generation.
-#
-# matrix = [[0,0,0,0],
-#           [0,1,1,0],
-#           [1,0,0,1],
-#           [0,1,1,0]] -- it will stay forever due to this and other rules
-#
 # Any live cell with more than three live neighbors dies, as if by overpopulation.
-#
-# matrix = [[0,0,0,0],
-#           [1,0,1,0],
-#           [0,1,0,0],
-#           [1,0,1,0]] -- middle one will be dead due to this rule, all other will also disappear due to first rule
-#
 # Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
-#
-# matrix = [[0,0,0,0],
-#           [0,1,1,0],
-#           [0,1,0,0],
-#           [0,0,0,0]] -- it will create a square
-#
-#================================================================================
 
 def draw_map(map):
     map_copy = deepcopy(map)
@@ -46,7 +21,7 @@ def draw_map(map):
 def count_neighbors(map, x, y):
     counter = 0
     height = len(map)
-    width = len(map[0])  # Fix here: Use len(map[0]) to get the width
+    width = len(map[0])
     relative_indices = [
         (-1,-1),(-1, 0),(-1, 1),
         ( 0,-1),        ( 0, 1),
@@ -55,7 +30,7 @@ def count_neighbors(map, x, y):
     for dx, dy in relative_indices:
         neighbor_x, neighbor_y = x + dx, y + dy
         if 0 <= neighbor_x < width and 0 <= neighbor_y < height:
-            if map[neighbor_y][neighbor_x] == 1:  # Fix here: Correct indexing
+            if map[neighbor_y][neighbor_x] == 1:
                 counter += 1
     return counter
 
@@ -91,9 +66,9 @@ def main():
     size = 40
     map = map_generator(size)
     empty_map = map_generator(size)
-    print('Generation: 0')
+    print('Starting generation: ')
     draw_map(map)
-    time.sleep(0.5)
+    time.sleep(2)
     for i in range(10):
         os.system('cls')
         print(f'Generation: {i + 1}')
