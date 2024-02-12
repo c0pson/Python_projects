@@ -7,8 +7,10 @@ def print_board(board):
     # for line in board:
     #     print(' '.join(map(str, line)))
 
+    print('+' + ('-' * 7 + '+') * 4)
     for line in board:
-        print(' '.join("{:<4}".format(word) for word in line))
+        print('| ' + '| '.join("{:^6}".format(word) for word in line) + '|')
+        print('+' + ('-' * 7 + '+') * 4)
 
 def starting_board():
     board = [[0] * 4 for _ in range(4)]
