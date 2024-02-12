@@ -4,8 +4,11 @@ import random
 
 def print_board(board):
     system('cls')
+    # for line in board:
+    #     print(' '.join(map(str, line)))
+
     for line in board:
-        print(' '.join(map(str, line)))
+        print(' '.join("{:<4}".format(word) for word in line))
 
 def starting_board():
     board = [[0] * 4 for _ in range(4)]
@@ -14,7 +17,6 @@ def starting_board():
     x_cord = random.randrange(4)
     y_cord = random.randrange(4)
     board[x_cord][y_cord] = int(starting_element)
-    board = [[2,2,2,2], [0,0,0,0], [0,0,0,0], [0,0,0,0]]
     print_board(board)
     return board
 
