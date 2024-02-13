@@ -29,6 +29,8 @@ def game_logic(key_pressed, map):
     map = deepcopy(map_copy)
     return map
 
+# I have to change the whole handling and might change to pygame due to technical reasons
+
 def print_map(map):
     os.system('cls')
     for line in map:
