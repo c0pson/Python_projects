@@ -1,3 +1,5 @@
+# class variables
+
 class Character:
 
     level = 1
