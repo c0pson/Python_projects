@@ -30,6 +30,9 @@ class Player:
         self.pos_y = self.pos_y + self.speed * direction
         self.player_rect = (self.pos_x, self.pos_y, self.width, self.height)
 
+    def get_coords(self):
+        return self.pos_x, self.pos_y
+
 class Ball:
     def __init__(self, pos_x, pos_y, size, speed, color):
         self.pos_x = pos_x
@@ -51,15 +54,17 @@ class Ball:
         if self.pos_x == 0 + self.size:
             self.move_x = 1 # there will be points system
 
-    def hit(self):
-        ...
-
         self.ball = pygame.draw.circle(screen, self.color, (self.pos_x, self.pos_y), self.size)
+
+    def hit(self):
+        self.move_x *= -1
 
     def move(self):
         self.pos_x = self.pos_x + self.move_x * self.speed
         self.pos_y = self.pos_y + self.move_y * self.speed
 
+    def get_coords(self):
+        return self.pos_x, self.pos_y
 
 def main():
     running = True
@@ -93,6 +98,12 @@ def main():
         player_2.update(player_2_direction)
         ball.move()
 
+        player_1_x, player_1_y = player_1.get_coords()
+        player_2_x, player_2_y = player_2.get_coords()
+        ball_x, ball_y = ball.get_coords()
+        if ball_x <= player_1_x + 40 and ball_x >= player_1_x + 40 and ball_y >= 0 and ball_y <= HEIGHT:
+            print('hit')
+            ball.hit()
         player_1.display()
         player_2.display()
         ball.display()
