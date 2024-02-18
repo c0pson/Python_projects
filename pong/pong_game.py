@@ -85,8 +85,14 @@ def main():
     ball = Ball(WIDTH//2-20, HEIGHT//2-20, 20, 10, 'blue')
     player_1_direction = 0
     player_2_direction = 0
+    counter = 0
     while running:
         screen.fill('gray')
+
+        if counter == 1:
+            counter = 0
+            time.sleep(2)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -123,10 +129,12 @@ def main():
         if ball_x >= WIDTH - 10:
             player_1.score()
             ball.reset_position()
+            counter += 1
 
         if ball_x <= 10:
             player_2.score()
             ball.reset_position()
+            counter += 1
 
         player_1.display()
         player_2.display()
