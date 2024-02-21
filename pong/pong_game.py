@@ -7,7 +7,6 @@ screen = pygame.display.set_mode((WIDTH, HEIGHT))
 font = pygame.font.SysFont('Brittanic', 60)
 clock = pygame.time.Clock()
 FPS = 60
-
 PLAYER_COLOR = (38, 80, 115)
 BALL_COLOR = (45, 149, 150)
 BACKGROUND_COLOR = (154, 208, 194)
@@ -160,3 +159,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
