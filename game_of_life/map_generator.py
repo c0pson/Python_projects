@@ -14,4 +14,6 @@ def main():
     size = int(input('Enter size of matrix: '))
     random_matrix(size)
 
-main()
+if __name__ == "__main__":
+    main()
+

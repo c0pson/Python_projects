@@ -71,4 +71,6 @@ def main():
     os.system(path)
     print_success("Program executed correctly!")
 
-main()
+if __name__ == "__main__":
+    main()
+
