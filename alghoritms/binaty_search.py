@@ -11,7 +11,7 @@ def generate_long_list():
 def binary_search(sorted_array, target):
     counter = 0
     while len(sorted_array) > 0:
-        middle_of_array = len(sorted_array) // 2 
+        middle_of_array = len(sorted_array) // 2
 
         if sorted_array[middle_of_array] > target:
             sorted_array = sorted_array[:middle_of_array]
@@ -33,4 +33,5 @@ def main():
     target = int(input("Enter number to search for: "))
     binary_search(sorted_list, target)
 
-main()
+if __name__ == '__main__':
+    main()
