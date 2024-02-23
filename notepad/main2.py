@@ -1,17 +1,23 @@
 import customtkinter as ctk
+from CTkMenuBar import CTkTitleMenu
 
-def text_field(root):
-    text_box = ctk.CTkTextbox(master=root, width=800, height=400, corner_radius=0)
-    text_box.grid(row=0,column=0, sticky='w')
-
-def button():
-    ...
+def click_button():
+    print('Hello Menu')
 
 def main():
     app = ctk.CTk()
-    app.geometry('1280x740')
-    # code here
-    text_field(app)
+    app.geometry('1280x780')
+    app.title('Note')
+    # menu bar
+    menu_bar = CTkTitleMenu(master=app)
+    menu_bar.add_cascade('File', command=click_button)
+    # left side of screen
+    left_frame = ctk.CTkFrame(master=app, fg_color='light yellow', corner_radius=5)
+    left_frame.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+    # right side of screen - flexible
+    right_frame = ctk.CTkFrame(master=app, fg_color='dark gray', corner_radius=5)
+    right_frame.pack(side='right',fill='both', expand=True, padx=5, pady=5)
+    # main loop
     app.mainloop()
 
 if __name__ == "__main__":
