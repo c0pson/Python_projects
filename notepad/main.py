@@ -1,6 +1,11 @@
 import customtkinter as ctk
 from customtkinter import filedialog
 
+PURPLE_1 = '#1F2544'
+PURPLE_2 = '#474F7A'
+PURPLE_3 = '#81689D'
+PURPLE_4 = '#FFD0EC'
+
 #--------------------------------file handling-------------------------------------#
 def try_opening_file(file_name):
     try:
@@ -17,13 +22,8 @@ def get_file_name():
 
 def modify_before_saving():
     text = text_box.get('0.0', 'end')
-    text = text.replace('\n\n', '\n')
-    lines = text.split('\n')
-    modified_text = '\n'.join(line + '\n' for line in lines)
-    for _ in range(2):
-        if modified_text.endswith('\n'):
-            modified_text = modified_text[:-1]
-    return modified_text
+    text = text.replace('\n\n', '\n').rstrip('\n')
+    return text
 #--------------------------------file handling-------------------------------------#
 
 
@@ -65,27 +65,27 @@ file_opened = []
 
 
 #-------------------------------right side of screen-------------------------------#
-right_frame = ctk.CTkFrame(master=app, fg_color='gray', corner_radius=0)
+right_frame = ctk.CTkFrame(master=app, fg_color=PURPLE_1, corner_radius=0)
 right_frame.pack(side='right',fill='both', expand=True, padx=0, pady=0)
     # content of right frame
 
-text_box = ctk.CTkTextbox(master=right_frame, font=my_font, corner_radius=6, activate_scrollbars=False)
+text_box = ctk.CTkTextbox(master=right_frame, font=my_font, fg_color=PURPLE_2, corner_radius=6, activate_scrollbars=False)
 text_box.pack(side='right', fill='both', expand=True, padx=10, pady=10)
 #-------------------------------right side of screen-------------------------------#
 
 
 #-------------------------------left side of screen--------------------------------#
-left_frame = ctk.CTkFrame(master=app, fg_color='gray', corner_radius=0)
+left_frame = ctk.CTkFrame(master=app, fg_color=PURPLE_1, corner_radius=0)
 left_frame.pack(side='top', fill='both', expand=True, padx=0, pady=0)
     #content of left side
 
-open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color='dark gray', corner_radius=6, text='Open', command=click_button_open)
+open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color=PURPLE_3, corner_radius=6, text='Open', command=click_button_open)
 open_button.pack(side='top', padx=10, pady=10)
 
-open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color='dark gray', corner_radius=6, text='Save', command=click_button_save)
+open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color=PURPLE_3, corner_radius=6, text='Save', command=click_button_save)
 open_button.pack(side='top', padx=10, pady=0)
 
-open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color='dark gray', corner_radius=6, text='Help', command=click_button_help)
+open_button = ctk.CTkButton(master=left_frame, font=my_font, fg_color=PURPLE_3, corner_radius=6, text='Help', command=click_button_help)
 open_button.pack(side='bottom', padx=10, pady=10)
 #-------------------------------left side of screen--------------------------------#
 
