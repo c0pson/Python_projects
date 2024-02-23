@@ -1,8 +1,6 @@
 import customtkinter as ctk
 from customtkinter import filedialog
 
-instruction = '''Usage:'''
-
 #--------------------------------file handling-------------------------------------#
 def try_opening_file(file_name):
     try:
@@ -33,14 +31,15 @@ def modify_before_saving():
 def click_button_open():
     file_name = filedialog.askopenfilename()
     if try_opening_file(file_name):
+        text_box.delete('0.0', 'end')
         with open(file_name, 'r') as file:
             content = file.read()
-            content.replace('\n\n', '\n')
+            content = content.replace('\n\n', '\n')
             text_box.insert('end', content)
         file_opened.clear()
         file_opened.append(file_name)
         file.close()
-        app.title(f'File opened: {file_name}')
+        app.title(f'File: {file_name}')
 
 def click_button_save():
     text = modify_before_saving()
@@ -51,7 +50,7 @@ def click_button_save():
         file.close()
 
 def click_button_help():
-    print(instruction)
+    print('instruction')
 #------------------------------------buttons---------------------------------------#
 
 
@@ -62,7 +61,6 @@ app.title('Note ')
 font_size = 23
 my_font = ctk.CTkFont(family='Hack Nerd Font Regular', size=font_size)
 file_opened = []
-lines = []
 #--------------------------------------root----------------------------------------#
 
 
@@ -72,7 +70,7 @@ right_frame.pack(side='right',fill='both', expand=True, padx=0, pady=0)
     # content of right frame
 
 text_box = ctk.CTkTextbox(master=right_frame, font=my_font, corner_radius=6, activate_scrollbars=False)
-text_box.pack(side='right', fill='both', expand=True, padx=5, pady=5)
+text_box.pack(side='right', fill='both', expand=True, padx=10, pady=10)
 #-------------------------------right side of screen-------------------------------#
 
 
