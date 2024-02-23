@@ -20,4 +20,3 @@ resolutions: list = [int(res) for  res in resolutions]
 resolutions.sort()
 
 print(resolutions)
-
