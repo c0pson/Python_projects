@@ -28,6 +28,15 @@ def print_error(frame_for_image, my_font):
     error_label = ctk.CTkLabel(master=frame_for_image, text='Invalid URL!', font=my_font, anchor='center')
     error_label.pack(side='top', anchor='center', expand=True)
 
+def check_path(path, app, frame, my_font):
+    if path == '':
+        app.title('YouTube Downloader ')
+        for widget in frame.winfo_children():
+            widget.destroy()
+        print_error(frame, my_font)
+        return 0
+    return 1
+
 def get_thumbnail(url):
     desired_width = 400
     desired_height = int((16 / 9) * desired_width)
@@ -62,20 +71,14 @@ def on_progress(stream, chunk, bytes_remaining, progress_bar, frame_for_buttons)
 def download_video(url, progress_bar, frame_for_buttons, frame_for_image, my_font, app):
     progress_bar.set(0.0)
     path_for_video = ctk.filedialog.askdirectory()
-    if path_for_video == '':
-        app.title('YouTube Downloader ')
-        for widget in frame_for_image.winfo_children():
-            widget.destroy()
-        print_error(frame_for_image, my_font)
-        return
-    try:
-        yt_object = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: on_progress(stream, chunk, bytes_remaining, progress_bar, frame_for_buttons))
-        # why it is so long
-        video = yt_object.streams.get_highest_resolution()
-        if video:
-            video.download(output_path=path_for_video)
-    except NotImplementedError:
-        pass
+    if check_path(path_for_video, app, frame_for_image, my_font):
+        try:
+            yt_object = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: on_progress(stream, chunk, bytes_remaining, progress_bar, frame_for_buttons))
+            video = yt_object.streams.get_highest_resolution()
+            if video:
+                video.download(output_path=path_for_video)
+        except NotImplementedError:
+            pass
 
 def application_window():
     WINDOW_X , WINDOW_Y = 1080, 720 # idk why
@@ -85,13 +88,10 @@ def application_window():
     app.resizable(False, False) # set static size
     my_font = ctk.CTkFont(family='Hack Nerd Font Regular', size=24) # set font
 
-    main_frame = ctk.CTkFrame(master=app, corner_radius=0)
-    main_frame.pack(side='top', fill='both', expand=True, padx=0, pady=0)
-
-    frame_for_image = ctk.CTkFrame(master=main_frame)
+    frame_for_image = ctk.CTkFrame(master=app)
     frame_for_image.pack(side='top', fill='both', expand=True, padx=10, pady=5)
 
-    frame_for_buttons = ctk.CTkFrame(master=main_frame, width=100)
+    frame_for_buttons = ctk.CTkFrame(master=app, width=100)
     frame_for_buttons.pack(side='top', fill='both', expand=False, padx=10, pady=5)
 
     progress_bar = ctk.CTkProgressBar(master=frame_for_buttons, width=500, height=15)
