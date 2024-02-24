@@ -81,12 +81,12 @@ def download_video(url, progress_bar, frame_for_buttons, frame_for_image, my_fon
             pass
 
 def application_window():
-    WINDOW_X , WINDOW_Y = 1080, 720 # idk why
-    app = ctk.CTk() # root
-    app.geometry(f'{WINDOW_X}x{WINDOW_Y}') # size of window
-    app.title('YouTube Downloader ') # title
-    app.resizable(False, False) # set static size
-    my_font = ctk.CTkFont(family='Hack Nerd Font Regular', size=24) # set font
+    WINDOW_X , WINDOW_Y = 1080, 720
+    app = ctk.CTk()
+    app.geometry(f'{WINDOW_X}x{WINDOW_Y}')
+    app.title('YouTube Downloader ')
+    app.resizable(False, False)
+    my_font = ctk.CTkFont(family='Hack Nerd Font Regular', size=24)
 
     frame_for_image = ctk.CTkFrame(master=app)
     frame_for_image.pack(side='top', fill='both', expand=True, padx=10, pady=5)
@@ -101,8 +101,8 @@ def application_window():
     url_input = ctk.CTkEntry(master=frame_for_buttons, corner_radius=10, width=700, height=80, font=my_font)
     url_input.pack(side='left', padx=40, pady=10, fill='x')
 
-    download_button = ctk.CTkButton(master=frame_for_buttons, text='Download',
-                                    font=my_font, command=lambda: display_thumbnail(url_input.get(), frame_for_image, my_font, app, progress_bar, frame_for_buttons),
+    download_button = ctk.CTkButton(master=frame_for_buttons, text='Download',font=my_font,
+                                    command=lambda: display_thumbnail(url_input.get(), frame_for_image, my_font, app, progress_bar, frame_for_buttons),
                                     width=200, height=80)
     download_button.pack(side='right', padx=40, pady=15)
 
