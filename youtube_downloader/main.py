@@ -22,6 +22,8 @@ def get_thumbnail_url(url):
 
 def display_thumbnail(url, frame_for_image, my_font, app):
     global counter
+    global progress_bar
+    progress_bar.set(0.0)
     if counter > 0:
         for widget in frame_for_image.winfo_children():
             widget.destroy()
