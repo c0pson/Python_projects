@@ -24,8 +24,8 @@ def clear_frame(frame):
     for widget in frame.winfo_children():
         widget.destroy()
 
-def print_error(frame_for_image, my_font):
-    error_label = ctk.CTkLabel(master=frame_for_image, text='Invalid URL!', font=my_font, anchor='center')
+def print_error(frame_for_image, my_font, message):
+    error_label = ctk.CTkLabel(master=frame_for_image, text=message, font=my_font, anchor='center')
     error_label.pack(side='top', anchor='center', expand=True)
 
 def check_path(path, app, frame, my_font):
@@ -33,7 +33,7 @@ def check_path(path, app, frame, my_font):
         app.title('YouTube Downloader ')
         for widget in frame.winfo_children():
             widget.destroy()
-        print_error(frame, my_font)
+        print_error(frame, my_font, 'Invalid path!')
         return 0
     return 1
 
@@ -59,7 +59,7 @@ def display_thumbnail(url, frame_for_image, my_font, app, progress_bar, frame_fo
         app.title(f'Downloading: {get_title(url)}')
         download_video(url, progress_bar, frame_for_buttons, frame_for_image, my_font, app)
     else:
-        print_error(frame_for_image, my_font)
+        print_error(frame_for_image, my_font, 'Invalid URL!')
 
 def on_progress(stream, chunk, bytes_remaining, progress_bar, frame_for_buttons):
     total_size = stream.filesize
