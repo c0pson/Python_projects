@@ -8,7 +8,7 @@ def press_tab(cell):
         return
     pyautogui.press('tab')
 
-def handle_delete(cell):
+def handle_delete():
     pyautogui.hotkey('shift', 'tab')
 
 def enter_click_handle(guess_list, word, attempt_nb, entry_boxes_to_color):
@@ -29,9 +29,7 @@ def enter_click_handle(guess_list, word, attempt_nb, entry_boxes_to_color):
         guess_list.extend([''] * 5)
 
 def check_row(event, entry_box, row_nb, attempt_nb, cell):
-    if event.keysym == 'Delete':
-        print('try it nerd')
-    check_length(event, entry_box)
+    check_length(event, entry_box, cell)
     if row_nb != attempt_nb[0]:
         return 'break'
 
@@ -49,11 +47,15 @@ def get_letter(event, cell, guess_list, entry_box):
     entry_box.update()
     press_tab(cell)
 
-def check_length(event, entry_box):
+def check_length(event, entry_box, cell):
+    entry_box.configure(state='readonly')
     if len(entry_box.get()) > 0 and event.keysym != 'Tab' and event.keysym != 'Return': # 'Return' is somehow 'Enter'
         entry_box.delete('0', 'end')
     if event.keysym == 'Return':
         pyautogui.press('Tab')
+    if event.keysym == 'BackSpace' and cell != 1:
+        handle_delete()
+    entry_box.configure(state='normal')
 
 def load_directory():
     working_directory = os.path.dirname(__file__)
