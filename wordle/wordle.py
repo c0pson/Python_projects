@@ -19,12 +19,14 @@ def enter_click_handle(guess_list, word, attempt_nb, entry_boxes_to_color):
     if word_from_list in list_of_words and '' not in guess_list:
         attempt_nb[0] += 1
         row_index = attempt_nb[0] - 2
+        highlighted_letters = set()
         for i in range(5):
             index_in_row = row_index * 5 + i
             if guess_list[i] == word[i]:
                 entry_boxes_to_color[index_in_row].configure(fg_color='green')
-            elif guess_list[i] in word:
+            elif guess_list[i] in word and guess_list[i] not in highlighted_letters:
                 entry_boxes_to_color[index_in_row].configure(fg_color='blue')
+                highlighted_letters.add(guess_list[i])
         guess_list.clear()
         guess_list.extend([''] * 5)
 
