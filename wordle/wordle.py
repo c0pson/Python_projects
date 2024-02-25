@@ -14,7 +14,7 @@ def enter_click_handle(guess_list, word):
 
 #main logic
 
-def check_row(event, entry_box, row_nb):
+def check_row(event, entry_box, row_nb, attempt_nb):
     check_length(event, entry_box)
     if row_nb != 1:
         return 'break'
