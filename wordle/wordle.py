@@ -87,7 +87,7 @@ def entry_frame_handle(app, my_font, cell, guess_list, row_nb, attempt_nb):
     return entry
 
 def setup_line(frame, my_font, guess_list, row, attempt_nb):
-    entries = [] # makes it possible to then color the right cell
+    entries = []
     for cell in range(1, 6):
         entry = entry_frame_handle(frame, my_font, cell, guess_list, row, attempt_nb)
         entries.append(entry)
@@ -100,7 +100,7 @@ def main_frame(app, my_font, guess_list, attempt_nb, word):
     centring_frame = ctk.CTkFrame(master=frame_for_words, corner_radius=10, fg_color='transparent')
     centring_frame.pack(side='top', expand=True, padx=5, pady=5)
 
-    entry_boxes = [] # makes it possible to then color the right cell
+    entry_boxes = []
     for row in range(1, 7):
         row_entry_boxes = setup_line(centring_frame, my_font, guess_list, row, attempt_nb)
         entry_boxes.extend(row_entry_boxes)
