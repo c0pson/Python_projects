@@ -3,24 +3,26 @@ import pyautogui
 import random
 import os
 
-def enter_click_handle(guess_list, word):
+def enter_click_handle(guess_list, word, attempt_nb):
     print(guess_list)
     for i in range(5):
         if guess_list[i] == word[i]:
             print(f'Letter {i+1} is correct')
 
-    if '' not in guess_list:
-        ...
+    attempt_nb[0] = int(attempt_nb[0]) + 1
+    print(attempt_nb)
+    return attempt_nb
 
 #main logic
 
 def check_row(event, entry_box, row_nb, attempt_nb):
     check_length(event, entry_box)
-    if row_nb != 1:
+    if row_nb != attempt_nb[0]:
         return 'break'
 
 def get_letter(event, cell, guess_list, entry_box):
-    acceptable_input = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+    acceptable_input = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                        'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     entry_text = entry_box.get()
     if entry_text not in acceptable_input:
         entry_box.delete('0', 'end')
@@ -29,6 +31,7 @@ def get_letter(event, cell, guess_list, entry_box):
     entry_text = entry_text.upper()
     entry_box.delete('0', 'end')
     entry_box.insert(0, entry_text)
+    entry_box.update()
     print(guess_list)
 
 def check_length(event, entry_box):
@@ -88,15 +91,15 @@ def main_frame(app, my_font, guess_list, attempt_nb):
     frame_for_words.grid_columnconfigure(0, weight=1)
     frame_for_words.grid_columnconfigure(6, weight=1)
 
-def button_frame(app, my_font, guess_list, word):
+def button_frame(app, my_font, guess_list, word, attempt_nb):
     frame_for_buttons = ctk.CTkFrame(master=app, width=360, corner_radius=10)
     frame_for_buttons.pack(side='top', fill='both', expand=True, padx=5, pady=5)
 
-    enter_button = ctk.CTkButton(master=frame_for_buttons, text='Enter', font=my_font, width=100, height=72, command=lambda: enter_click_handle(guess_list, word))
+    enter_button = ctk.CTkButton(master=frame_for_buttons, text='Enter', font=my_font, width=100, height=72, command=lambda: enter_click_handle(guess_list, word, attempt_nb))
     enter_button.pack(expand=True)
 
 def main():
-    attempt_nb = 1
+    attempt_nb = [1]
     words = load_directory()
     word = get_random_word(words)
     guess_list = [''] * 5
@@ -110,7 +113,7 @@ def main():
 
     main_frame(app, my_font, guess_list, attempt_nb)
 
-    button_frame(app, my_font, guess_list, word)
+    button_frame(app, my_font, guess_list, word, attempt_nb)
 
     app.mainloop()
 
