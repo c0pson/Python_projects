@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import pyautogui
 import random
+import time
 import os
 
 def press_tab(cell):
@@ -30,7 +31,14 @@ def win(app, my_font, guess_list, attempt_nb, word, entry_boxes):
 def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, my_font, entry_boxes):
     word_from_list = ''.join(guess_list)
     list_of_words = load_all_words(load_directory())
-    counter = 0
+    if guess_list == word:
+        row_index = attempt_nb[0] - 1
+        for i in range(5):
+            index_in_row = row_index * 5 + i
+            entry_boxes_to_color[index_in_row].configure(fg_color='green')
+            entry_boxes_to_color[index_in_row].update()
+        app.after(1000, win(app, my_font, guess_list, attempt_nb, word, entry_boxes))
+        return
     if '' in guess_list:
         pass
     if word_from_list in list_of_words and '' not in guess_list:
@@ -41,15 +49,11 @@ def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, 
             index_in_row = row_index * 5 + i
             if guess_list[i] == word[i]:
                 entry_boxes_to_color[index_in_row].configure(fg_color='green')
-                counter += 1
             elif guess_list[i] in word and guess_list[i] not in highlighted_letters:
                 entry_boxes_to_color[index_in_row].configure(fg_color='blue')
                 highlighted_letters.add(guess_list[i])
         guess_list.clear()
         guess_list.extend([''] * 5)
-    if counter == 5:
-        win(app, my_font, guess_list, attempt_nb, word, entry_boxes)
-    counter = 0
 
 def check_row(event, entry_box, row_nb, attempt_nb, cell):
     check_length(event, entry_box, cell)
@@ -100,9 +104,9 @@ def get_random_word(words):
     word_as_list = []
     list_of_words = load_all_words(words)
     word = random.choice(list_of_words)
+    print(word)
     for letter in word:
         word_as_list.append(letter)
-    print(word_as_list)
     return word_as_list
 
 def entry_frame_handle(app, my_font, cell, guess_list, row_nb, attempt_nb):
