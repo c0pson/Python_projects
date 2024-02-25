@@ -1,7 +1,6 @@
 import customtkinter as ctk
 import pyautogui
 import random
-import time
 import os
 
 def press_tab(cell):
