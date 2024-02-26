@@ -16,7 +16,8 @@ def press_tab(cell):
         return
     pyautogui.press('tab')
 
-def handle_delete():
+def handle_delete(cell, guess_list):
+    guess_list[cell-1] = ''
     pyautogui.hotkey('shift', 'tab')
 
 def remove_all(app):
@@ -24,31 +25,29 @@ def remove_all(app):
     for widget in widgets:
         widget.destroy()
 
-def win(app, my_font, guess_list, attempt_nb, word):
-    remove_all(app)
+def end_of_game_info(app, my_font, win_or_loose_info):
     pop_up = ctk.CTkFrame(master=app, fg_color='#463f3a', corner_radius=10)
     pop_up.pack(expand=True, fill='both', padx=5, pady=5)
-
-    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text='YOU WON!!', bg_color='#463f3a')
+    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text=win_or_loose_info, bg_color='#463f3a')
     win_label.pack(side='top', expand=True, padx=10, pady=10)
 
+def reset_button(app, my_font, pop_up, guess_list, attempt_nb, word):
     reset_button = ctk.CTkButton(master=pop_up, width=140, height=40, font=my_font,
                                 text='PLAY AGAIN', fg_color='#bcb8b1', hover_color='#e0afa0', text_color='#f4f3ee',
                                 command=lambda: restart_app(app, my_font, guess_list, attempt_nb, word))
     reset_button.pack(side='top', expand=True, padx=10, pady=10)
+
+def win(app, my_font, guess_list, attempt_nb, word):
+    remove_all(app)
+    pop_up = end_of_game_info(app, my_font, 'YOU WON!!!')
+
+    reset_button(app, my_font, pop_up, guess_list, attempt_nb, word)
 
 def loose(app, my_font, guess_list, attempt_nb, word):
     remove_all(app)
-    pop_up = ctk.CTkFrame(app)
-    pop_up.pack(expand=True)
+    pop_up = end_of_game_info(app, my_font, 'GAME OVER')
 
-    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text='GAME OVER', bg_color='#463f3a')
-    win_label.pack(side='top', expand=True, padx=10, pady=10)
-
-    reset_button = ctk.CTkButton(master=pop_up, width=140, height=40, font=my_font,
-                                text='PLAY AGAIN', fg_color='#bcb8b1', hover_color='#e0afa0', text_color='#f4f3ee',
-                                command=lambda: restart_app(app, my_font, guess_list, attempt_nb, word))
-    reset_button.pack(side='top', expand=True, padx=10, pady=10)
+    reset_button(app, my_font, pop_up, guess_list, attempt_nb, word)
 
 def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, my_font):
     if '' in guess_list:
@@ -80,8 +79,8 @@ def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, 
         guess_list.clear()
         guess_list.extend([''] * 5)
 
-def check_row(event, entry_box, row_nb, attempt_nb, cell):
-    check_length(event, entry_box, cell)
+def check_row(event, entry_box, row_nb, attempt_nb, cell, guess_list):
+    check_length(event, entry_box, cell, guess_list)
     if row_nb != attempt_nb[0]:
         return 'break'
 
@@ -99,17 +98,19 @@ def get_letter(event, cell, guess_list, entry_box):
     entry_box.update()
     press_tab(cell)
 
-def check_length(event, entry_box, cell):
-    entry_box.configure(state='readonly')
+def check_length(event, entry_box, cell, guess_list):
     if len(entry_box.get()) > 0 and event.keysym != 'Tab' and event.keysym != 'Return':
         entry_box.delete('0', 'end')
+        return
     if event.keysym == 'Return':
         pyautogui.press('Tab')
+        return
     if event.keysym == 'BackSpace' and cell != 1 and cell != 5:
-        handle_delete()
-    if event.keysym == 'BackSpace' and entry_box.get() == '' and cell == 5:
-        handle_delete()
-    entry_box.configure(state='normal')
+        handle_delete(cell, guess_list)
+        return
+    if  event.keysym == 'BackSpace' and entry_box.get() == '' and cell == 5:
+        handle_delete(cell, guess_list)
+        return
 
 def load_directory():
     working_directory = os.path.dirname(__file__)
@@ -134,10 +135,10 @@ def get_random_word(words):
     return word_as_list
 
 def entry_frame_handle(app, my_font, cell, guess_list, row_nb, attempt_nb):
-    entry = ctk.CTkEntry(master=app, font=my_font, width=44, height=42, fg_color='#8a817c', border_color='#e0afa0', border_width=2)
+    entry = ctk.CTkEntry(master=app, font=my_font, width=44, height=42, fg_color='#a98467', border_color='#e0afa0', border_width=2)
     entry.configure(insertontime=0)
-    entry.grid(row=row_nb-1, column=cell-1, padx=5, pady=5, sticky='nsew')
-    entry.bind(sequence='<KeyPress>', command=lambda event: check_row(event, entry, row_nb, attempt_nb, cell))
+    entry.grid(row=row_nb-1, column=cell-1, padx=5, pady=5)
+    entry.bind(sequence='<KeyPress>', command=lambda event: check_row(event, entry, row_nb, attempt_nb, cell, guess_list))
     entry.bind(sequence='<KeyRelease>', command=lambda event: get_letter(event, cell, guess_list, entry))
     return entry
 
@@ -189,6 +190,7 @@ def main():
     words = load_directory()
     word = get_random_word(words)
     guess_list = [''] * 5
+    print(word)
 
     WIDTH, HEIGHT = 520, 680
     app = ctk.CTk()
