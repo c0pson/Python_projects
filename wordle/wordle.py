@@ -3,6 +3,14 @@ import pyautogui
 import random
 import os
 
+# enum was not working 
+# CORRECT_GREEN = '#06d6a0'
+# EXISTING_BLUE = '#0077b6'
+# BACKGROUND_COLOR = '#463f3a'
+# FRAME_COLOR_1 = '#8a817c'
+# BUTTON_COLOR = '#bcb8b1'
+# TEXT_COLOR = '#f4f3ee'
+
 def press_tab(cell):
     if cell == 5:
         return
@@ -16,30 +24,48 @@ def remove_all(app):
     for widget in widgets:
         widget.destroy()
 
-def win(app, my_font, guess_list, attempt_nb, word, entry_boxes):
+def win(app, my_font, guess_list, attempt_nb, word):
+    remove_all(app)
+    pop_up = ctk.CTkFrame(master=app, fg_color='#463f3a', corner_radius=10)
+    pop_up.pack(expand=True, fill='both', padx=5, pady=5)
+
+    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text='YOU WON!!', bg_color='#463f3a')
+    win_label.pack(side='top', expand=True, padx=10, pady=10)
+
+    reset_button = ctk.CTkButton(master=pop_up, width=140, height=40, font=my_font,
+                                text='PLAY AGAIN', fg_color='#bcb8b1', hover_color='#e0afa0', text_color='#f4f3ee',
+                                command=lambda: restart_app(app, my_font, guess_list, attempt_nb, word))
+    reset_button.pack(side='top', expand=True, padx=10, pady=10)
+
+def loose(app, my_font, guess_list, attempt_nb, word):
     remove_all(app)
     pop_up = ctk.CTkFrame(app)
     pop_up.pack(expand=True)
 
-    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text='YOU WON!!')
+    win_label = ctk.CTkLabel(master=pop_up, width=140, height=40, font=my_font, text='GAME OVER', bg_color='#463f3a')
     win_label.pack(side='top', expand=True, padx=10, pady=10)
 
-    reset_button = ctk.CTkButton(master=pop_up, width=140, height=40, font=my_font, text='PLAY AGAIN', command=lambda: restart_app(app, my_font, guess_list, attempt_nb, word, entry_boxes))
+    reset_button = ctk.CTkButton(master=pop_up, width=140, height=40, font=my_font,
+                                text='PLAY AGAIN', fg_color='#bcb8b1', hover_color='#e0afa0', text_color='#f4f3ee',
+                                command=lambda: restart_app(app, my_font, guess_list, attempt_nb, word))
     reset_button.pack(side='top', expand=True, padx=10, pady=10)
 
-def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, my_font, entry_boxes):
+def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, my_font):
+    if '' in guess_list:
+        return
+    if attempt_nb[0] == 6 and '' not in guess_list:
+        loose(app, my_font, guess_list, attempt_nb, word)
+        return
     word_from_list = ''.join(guess_list)
     list_of_words = load_all_words(load_directory())
     if guess_list == word:
         row_index = attempt_nb[0] - 1
         for i in range(5):
             index_in_row = row_index * 5 + i
-            entry_boxes_to_color[index_in_row].configure(fg_color='green')
+            entry_boxes_to_color[index_in_row].configure(fg_color='#06d6a0')
             entry_boxes_to_color[index_in_row].update()
-        app.after(1000, win(app, my_font, guess_list, attempt_nb, word, entry_boxes))
+        app.after(1000, win(app, my_font, guess_list, attempt_nb, word))
         return
-    if '' in guess_list:
-        pass
     if word_from_list in list_of_words and '' not in guess_list:
         attempt_nb[0] += 1
         row_index = attempt_nb[0] - 2
@@ -47,9 +73,9 @@ def enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes_to_color, 
         for i in range(5):
             index_in_row = row_index * 5 + i
             if guess_list[i] == word[i]:
-                entry_boxes_to_color[index_in_row].configure(fg_color='green')
+                entry_boxes_to_color[index_in_row].configure(fg_color='#06d6a0')
             elif guess_list[i] in word and guess_list[i] not in highlighted_letters:
-                entry_boxes_to_color[index_in_row].configure(fg_color='blue')
+                entry_boxes_to_color[index_in_row].configure(fg_color='#0077b6')
                 highlighted_letters.add(guess_list[i])
         guess_list.clear()
         guess_list.extend([''] * 5)
@@ -75,7 +101,7 @@ def get_letter(event, cell, guess_list, entry_box):
 
 def check_length(event, entry_box, cell):
     entry_box.configure(state='readonly')
-    if len(entry_box.get()) > 0 and event.keysym != 'Tab' and event.keysym != 'Return': # 'Return' is somehow 'Enter'
+    if len(entry_box.get()) > 0 and event.keysym != 'Tab' and event.keysym != 'Return':
         entry_box.delete('0', 'end')
     if event.keysym == 'Return':
         pyautogui.press('Tab')
@@ -103,13 +129,12 @@ def get_random_word(words):
     word_as_list = []
     list_of_words = load_all_words(words)
     word = random.choice(list_of_words)
-    print(word)
     for letter in word:
         word_as_list.append(letter)
     return word_as_list
 
 def entry_frame_handle(app, my_font, cell, guess_list, row_nb, attempt_nb):
-    entry = ctk.CTkEntry(master=app, font=my_font, width=44, height=42)
+    entry = ctk.CTkEntry(master=app, font=my_font, width=44, height=42, fg_color='#8a817c', border_color='#e0afa0', border_width=2)
     entry.configure(insertontime=0)
     entry.grid(row=row_nb-1, column=cell-1, padx=5, pady=5, sticky='nsew')
     entry.bind(sequence='<KeyPress>', command=lambda event: check_row(event, entry, row_nb, attempt_nb, cell))
@@ -124,7 +149,7 @@ def setup_line(frame, my_font, guess_list, row, attempt_nb):
     return entries
 
 def main_frame(app, my_font, guess_list, attempt_nb, word):
-    frame_for_words = ctk.CTkFrame(master=app, corner_radius=10)
+    frame_for_words = ctk.CTkFrame(master=app, corner_radius=10, fg_color='#463f3a')
     frame_for_words.pack(side='top', fill='both', expand=True, padx=5, pady=5)
 
     centring_frame = ctk.CTkFrame(master=frame_for_words, corner_radius=10, fg_color='transparent')
@@ -143,13 +168,15 @@ def main_frame(app, my_font, guess_list, attempt_nb, word):
     button_frame(app, my_font, guess_list, word, attempt_nb, entry_boxes)
 
 def button_frame(app, my_font, guess_list, word, attempt_nb, entry_boxes):
-    frame_for_buttons = ctk.CTkFrame(master=app, width=360, corner_radius=10)
+    frame_for_buttons = ctk.CTkFrame(master=app, width=360, corner_radius=10, fg_color='#463f3a')
     frame_for_buttons.pack(side='top', fill='both', expand=True, padx=5, pady=5)
 
-    enter_button = ctk.CTkButton(master=frame_for_buttons, text='Enter', font=my_font, width=100, height=72, command=lambda: enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes, my_font, entry_boxes))
+    enter_button = ctk.CTkButton(master=frame_for_buttons, text='Enter',
+                                font=my_font, width=100, height=72, fg_color='#bcb8b1', hover_color='#e0afa0', text_color='#f4f3ee',
+                                command=lambda: enter_click_handle(app, guess_list, word, attempt_nb, entry_boxes, my_font))
     enter_button.pack(expand=True)
 
-def restart_app(app, my_font, guess_list, attempt_nb, word, entry_boxes):
+def restart_app(app, my_font, guess_list, attempt_nb, word):
     guess_list.clear()
     guess_list.extend([''] * 5)
     attempt_nb[0] = 1
@@ -165,8 +192,11 @@ def main():
 
     WIDTH, HEIGHT = 520, 680
     app = ctk.CTk()
+    user_path = os.path.dirname(__file__)
+    app.iconbitmap(os.path.join(user_path, 'letter-w.ico'))
     app.geometry(f'{WIDTH}x{HEIGHT}')
-    app.title('WORDLE')
+    app.title('WORDLE IN PYTHON')
+    app.minsize(WIDTH-100, HEIGHT-100)
     my_font = ctk.CTkFont(family='Hack Nerd Font Regular', size=44)
 
     main_frame(app, my_font, guess_list, attempt_nb, word)
