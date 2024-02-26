@@ -2578,6 +2578,7 @@ state
 stave
 stays
 stead
+steam
 steak
 steal
 steam
