@@ -1,12 +1,13 @@
 import customtkinter as ctk
 from PIL import Image
 
-def login(app, password_box):
+def login_proc(app, password_box):
     password = password_box.get()
     secret_password = 'secret' # I will add some hashing or something like this
     if secret_password == password:
         for child in app.winfo_children():
             child.destroy()
+        after_login(app)
 
 def login_page(app, my_font):
     login_frame = ctk.CTkFrame(master=app, corner_radius=10)
@@ -22,10 +23,10 @@ def login_page(app, my_font):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50,
                                 corner_radius=10, text='Login', font=my_font,
-                                command=lambda: login(app, password_box))
+                                command=lambda: login_proc(app, password_box))
     login_button.pack(padx=10, pady=15)
 
-def pop_up_error(app, button_index_2, my_font_x32, my_font_x16):
+def pop_up_dialog(app, button_index_2, my_font_x32, my_font_x16):
     x = app.winfo_screenwidth() // 2
     y = app.winfo_screenheight() // 2
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\error-7-512-1390027183.png'
@@ -47,35 +48,68 @@ def pop_up_error(app, button_index_2, my_font_x32, my_font_x16):
         return ''
     return label_name
 
-def main():
-    app = ctk.CTk()
-    app.title('Password manager')
-    x = app.winfo_screenwidth() // 2
-    y = app.winfo_screenheight() // 2
-    app.geometry(f'1080x720+{x-540}+{y-400}')
+def load_info(content_frame, current_label, my_font_x32, my_font_x21):
+    for child in content_frame.winfo_children():
+        child.destroy()
+    title_label = ctk.CTkLabel(master=content_frame, corner_radius=5, text=' '+''.join(current_label), font=my_font_x32, fg_color='#7D7C7C', anchor='w')
+    title_label.pack(side='top', fill='x', padx=5, pady=5)
+
+    url_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
+    url_frame.pack(side='top', padx=5, pady=3, fill='x')
+
+    url_text = ctk.CTkLabel(master=url_frame, text=' URL: ', font=my_font_x32)
+    url_text.pack(side='left', padx=2, pady=10)
+
+    url_label = ctk.CTkEntry(master=url_frame, height=48, font=my_font_x32)
+    url_label.pack(side='left', pady=10, fill='x', expand=True)
+
+    save_button = ctk.CTkButton(master=url_frame, corner_radius=5, text='Edit', height=48, font=my_font_x21)
+    save_button.pack(side='right', padx=8, pady=10)
+
+    copy_button = ctk.CTkButton(master=url_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
+    copy_button.pack(side='right', padx=16, pady=10)
+
+    pass_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
+    pass_frame.pack(side='top', padx=5, pady=3, fill='x')
+
+    url_text = ctk.CTkLabel(master=pass_frame, text=' Password: ', font=my_font_x32)
+    url_text.pack(side='left', padx=2, pady=10)
+
+    url_label = ctk.CTkEntry(master=pass_frame, height=48, font=my_font_x32)
+    url_label.pack(side='left', pady=10, fill='x', expand=True)
+
+    save_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Edit', height=48, font=my_font_x21)
+    save_button.pack(side='right', padx=8, pady=10)
+
+    copy_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
+    copy_button.pack(side='right', padx=16, pady=10)
+
+    buttons_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
+    buttons_frame.pack(side='top', padx=5, pady=3, fill='both', expand=True)
+
+def after_login(app):
     my_font_x32 = ctk.CTkFont(family='Hack Nerd Font Propo', size=32)
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
 
-    # login_page(app, my_font_x32)
     button_index = []
     button_index_2 = []
     current_label = ['']
 
     def button_clicked(event, label):
-        print(int(button_index_2.index(label.cget('text'))))
         if current_label[0] != '':
             button_index[int(button_index_2.index(current_label[0]))].configure(fg_color='transparent')
         button_index[int(button_index_2.index(label.cget('text')))].configure(fg_color='gray')
         current_label[0] = label.cget('text')
+        load_info(content_frame, current_label, my_font_x32, my_font_x21)
 
     def add():
-        label_name = str(pop_up_error(app, button_index_2, my_font_x32, my_font_x16))
+        label_name = str(pop_up_dialog(app, button_index_2, my_font_x32, my_font_x16))
         if label_name == '':
             return
-        new_label=ctk.CTkLabel(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=10)
+        new_label=ctk.CTkLabel(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5)
         new_label.bind(sequence='<Button-1>', command=lambda event: button_clicked(event, new_label))
-        new_label.pack(side='top', fill='x')
+        new_label.pack(side='top', fill='x', padx=3, pady=5)
         button_index.append(new_label)
         button_index_2.append(label_name)
 
@@ -86,26 +120,35 @@ def main():
             button_index_2.pop(int(button_index_2.index(current_label[0])))
         current_label[0] = ''
 
-    main_frame = ctk.CTkFrame(master=app, corner_radius=10)
-    main_frame.pack(side='left', expand=True, fill='both', padx=5, pady=5)
+    main_frame = ctk.CTkFrame(master=app, corner_radius=0)
+    main_frame.pack(side='left', expand=True, fill='both', padx=0, pady=0)
 
     index_frame = ctk.CTkFrame(master=main_frame, corner_radius=7)
     index_frame.pack(side='left', fill='y', padx=5, pady=5)
 
-    password_index_frame = ctk.CTkScrollableFrame(master=index_frame, corner_radius=4)
+    password_index_frame = ctk.CTkScrollableFrame(master=index_frame, corner_radius=4, scrollbar_button_color='gray')
     password_index_frame.pack(side='top', expand=True, fill='both', padx=3, pady=3)
 
     buttons_index_frame = ctk.CTkFrame(master=index_frame, corner_radius=4)
     buttons_index_frame.pack(side='bottom', fill='x', padx=3, pady=3)
 
-    add_button = ctk.CTkButton(master=buttons_index_frame, text='Add', font=my_font_x32, command=add)
-    add_button.pack(side='top', fill='both', padx=15, pady=5)
+    add_button = ctk.CTkButton(master=buttons_index_frame, text='Add', font=my_font_x21, height=38, anchor='center', command=add)
+    add_button.pack(side='top', fill='x', padx=10, pady=8)
 
-    remove_button = ctk.CTkButton(master=buttons_index_frame, text='Remove', font=my_font_x32, command=remove)
-    remove_button.pack(side='top', fill='both', padx=15, pady=5)
+    remove_button = ctk.CTkButton(master=buttons_index_frame, text='Remove', font=my_font_x21, height=40, anchor='center', command=remove)
+    remove_button.pack(side='top', fill='x', padx=10, pady=8)
 
     content_frame = ctk.CTkFrame(master=main_frame, corner_radius=7)
     content_frame.pack(side='right', expand=True, fill='both', padx=5, pady=5)
+
+def main():
+    app = ctk.CTk()
+    app.title('Password manager')
+    x = app.winfo_screenwidth() // 2
+    y = app.winfo_screenheight() // 2
+    app.geometry(f'1080x720+{x-540}+{y-400}')
+    my_font_x32 = ctk.CTkFont(family='Hack Nerd Font Propo', size=32)
+    login_page(app, my_font_x32)
 
     app.mainloop()
 
