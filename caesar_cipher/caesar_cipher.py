@@ -40,7 +40,7 @@ def get_shift_from_user() -> int:
         user_input = input('Enter shift value (1 to 25): ')
         try:
             user_input = int(user_input)
-            if 1 <= user_input < alphabet_len:
+            if 0 <= user_input < alphabet_len:
                 return user_input
             else:
                 print('Please provide a number in the range from 1 to 25.')
@@ -57,7 +57,7 @@ def get_text_from_user() -> str:
 
 def save_text(text) -> None:
     path_to_file = os.path.dirname(__file__)
-    path_to_file = os.path.join(path_to_file, 'text_after_man.txt')
+    path_to_file = os.path.join(path_to_file, 'output.txt')
     with open(path_to_file, 'w') as file:
         file.write(text)
     file.close()
@@ -96,27 +96,37 @@ def decode_from_key(text: str, key: list[str], alphabet: list[str]) -> list[str]
         counter += 1
     return decoded_text
 
-def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
-    spacing = '=======' * 20
+def brute_force(text, alphabet, spacing) -> list[str]:
     decoded_text = [''] * len(text)
     brute_force_tries = [''] * len(alphabet)
-    if len(text) > 100:
-        ... # better handling long texts
     for i in range(len(alphabet)):
-        counter = 0
-        shifted_alphabet = key(alphabet, i)
-        for letter in text:
-            if letter.lower() not in alphabet:
-                decoded_text[counter] = letter
-            else:
-                if letter.islower():
-                    decoded_text[counter] = alphabet[shifted_alphabet.index(letter)]
+            counter = 0
+            shifted_alphabet = key(alphabet, i)
+            for letter in text:
+                if letter.lower() not in alphabet:
+                    decoded_text[counter] = letter
                 else:
-                    decoded_text[counter] = alphabet[shifted_alphabet.index(letter.lower())].upper()
-            counter += 1
-        brute_force_tries[i] = f'Shift by {i}: \n\n' + ''.join(decoded_text) + f'\n\n{spacing} \n'
-        decoded_text = [''] * len(text)
+                    if letter.islower():
+                        decoded_text[counter] = alphabet[shifted_alphabet.index(letter)]
+                    else:
+                        decoded_text[counter] = alphabet[shifted_alphabet.index(letter.lower())].upper()
+                counter += 1
+            brute_force_tries[i] = f'Shift by {i}: \n\n' + ''.join(decoded_text) + f'\n\n{spacing} \n'
+            decoded_text = [''] * len(text)
     return brute_force_tries
+
+def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
+    spacing = '=======' * 20
+    if len(text) > 50:
+        decoded_text = brute_force(text[0:51], alphabet, spacing)
+        for item in decoded_text:
+            print(item)
+        shift = get_shift_from_user()
+        shifted_alphabet = key(alphabet, shift)
+        decoded_text = decode_from_key(text, shifted_alphabet, alphabet)
+    else:
+        decoded_text = brute_force(text, alphabet, spacing)
+    return decoded_text
 
 def method_for_long_texts(text, alphabet):
     frequency_of_letters = {  # noqa: F841
@@ -177,7 +187,7 @@ def method_for_long_texts(text, alphabet):
         'z': 0,
     }
 
-    # research for frequency of letters in most popular books on 13_624_683 characters
+    # research for frequency of letters in most popular books on almost 13_624_683 characters
     for letter in text:
         letter = letter.lower()
         if letter in alphabet:
