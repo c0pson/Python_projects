@@ -11,16 +11,20 @@ def get_shift_from_user() -> int:
         except ValueError:
             print('Provide integer number!')
 
+def get_text_from_user() -> str:
+    user_input = input('Enter text: ')
+    return user_input
+
 def key(alphabet: list[str], shift: int) -> list[str]:
     shifted_alphabet = [''] * len(alphabet)
     for i in range(len(alphabet)):
         shifted_alphabet[i] = alphabet[i-shift]
     return shifted_alphabet
 
-def encode(text: str, key: list[str], alphabet: list[str]):
+def encode(text: str, key: list[str], alphabet: list[str]) -> list[str]:
     encoded_text = [''] * len(text)
     counter = 0
-    special_characters = ' .,?!;:-!@#$%^&*()=+_\\[]{};\'\"<>?/~`'
+    special_characters = ' .,?!;:-!@#$%^&*()=+_\\[]{};\'\"<>?/~`1234567890'
     for letter in text:
         if letter.lower() in special_characters:
             encoded_text[counter] = letter
@@ -30,14 +34,16 @@ def encode(text: str, key: list[str], alphabet: list[str]):
             else:
                 encoded_text[counter] = key[alphabet.index(letter.lower())].upper()
         counter += 1
-    print(''.join(encoded_text))
+    return encoded_text
 
 def main() -> None:
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     shift = get_shift_from_user()
     shifted_alphabet = key(alphabet, shift)
-    encode("The quick brown fox jumps over the lazy dog.", shifted_alphabet, alphabet)
+    text = get_text_from_user()
+    encoded_text = encode(text, shifted_alphabet, alphabet)
+    print(''.join(encoded_text))
 
 if __name__ == "__main__":
     main()
