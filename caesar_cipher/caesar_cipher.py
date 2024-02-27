@@ -1,6 +1,6 @@
 def get_mode_from_user(alphabet):
     while True:
-        user_input = input('Select mode \n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n: ')
+        user_input = input('Encryption\\Decryption in python\n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n:')
         try:
             user_input = int(user_input)
             if user_input == 1:
@@ -56,7 +56,7 @@ def get_text_from_user() -> str:
 def key(alphabet: list[str], shift: int) -> list[str]:
     shifted_alphabet = [''] * len(alphabet)
     for i in range(len(alphabet)):
-        shifted_alphabet[i] = alphabet[i-shift]
+        shifted_alphabet[i-shift] = alphabet[i]
     return shifted_alphabet
 
 def encode(text: str, key: list[str], alphabet: list[str]) -> list[str]:
