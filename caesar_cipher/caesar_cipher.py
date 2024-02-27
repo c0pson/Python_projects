@@ -1,3 +1,41 @@
+def get_mode_from_user(alphabet):
+    while True:
+        user_input = input('Select mode \n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n: ')
+        try:
+            user_input = int(user_input)
+            if user_input == 1:
+                mode_1(alphabet)
+                return
+            elif user_input == 2:
+                mode_2(alphabet)
+                return
+            elif user_input == 3:
+                mode_3(alphabet)
+                return
+            else:
+                print('Provide only number associated with modes provided above')
+        except ValueError:
+            print('Provide only number associated with modes provided above')
+
+def mode_1(alphabet):
+    shift = get_shift_from_user()
+    shifted_alphabet = key(alphabet, shift)
+    text = get_text_from_user()
+    encoded_text = encode(text, shifted_alphabet, alphabet)
+    print(''.join(encoded_text))
+
+def mode_2(alphabet):
+    shift = get_shift_from_user()
+    text = get_text_from_user()
+    shifted_alphabet = key(alphabet, shift)
+    decoded_text = decode_from_key(text, shifted_alphabet, alphabet)
+    print(''.join(decoded_text))
+
+def mode_3(alphabet):
+    text = get_text_from_user()
+    brute_force_texts = decode_brute_force(text, alphabet)
+    print(''.join(brute_force_texts))
+
 def get_shift_from_user() -> int:
     alphabet_len = 26
     while True:
@@ -74,15 +112,7 @@ def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
 def main() -> None:
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-    shift = get_shift_from_user()
-    shifted_alphabet = key(alphabet, shift)
-    text = get_text_from_user()
-    encoded_text = encode(text, shifted_alphabet, alphabet)
-    decoded_text = decode_from_key(''.join(encoded_text), shifted_alphabet, alphabet)
-    brute_force_texts = decode_brute_force(''.join(encoded_text), alphabet)
-    print(f'Encoded text: {''.join(encoded_text)}')
-    print(f'Decoded text: {''.join(decoded_text)}')
-    print(f'Brute force tries: {brute_force_texts}')
+    get_mode_from_user(alphabet)
 
 if __name__ == "__main__":
     main()
