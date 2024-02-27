@@ -2,7 +2,7 @@ import os
 
 def get_mode_from_user() -> int:
     while True:
-        user_inp = input('Encryption/Decryption in python using Caesar cipher\n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n:')
+        user_inp = input("Encryption/Decryption in python using Caesar cipher\n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n:")
         try:
             user_inp = int(user_inp)
             if user_inp == 1:
@@ -97,6 +97,7 @@ def decode_from_key(text: str, key: list[str], alphabet: list[str]) -> list[str]
     return decoded_text
 
 def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
+    spacing = '=======' * 20
     decoded_text = [''] * len(text)
     brute_force_tries = [''] * len(alphabet)
     for i in range(len(alphabet)):
@@ -111,7 +112,7 @@ def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
                 else:
                     decoded_text[counter] = alphabet[shifted_alphabet.index(letter.lower())].upper()
             counter += 1
-        brute_force_tries[i] = f'Attempt {i+1}: \n\n' + ''.join(decoded_text) + '\n\n'
+        brute_force_tries[i] = f'Shift by {i+1}: \n\n' + ''.join(decoded_text) + f'\n\n{spacing} \n'
         decoded_text = [''] * len(text)
     return brute_force_tries
 
