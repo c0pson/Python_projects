@@ -45,7 +45,7 @@ def mode_3(alphabet: list[str]) -> None:
 
 def mode_4(alphabet: list[str]) -> None:
     text = get_text_from_user()
-    frequency_analysis = method_for_long_texts(text, alphabet)
+    frequency_analysis = method_for_longer_texts(text, alphabet)
     save_text(''.join(frequency_analysis))
 
 def get_shift_from_user() -> int:
@@ -142,7 +142,7 @@ def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
         decoded_text = brute_force(text, alphabet, spacing)
     return decoded_text
 
-def method_for_long_texts(text: str, alphabet: list[str]) -> list[str]:
+def method_for_longer_texts(text: str, alphabet: list[str]) -> list[str]:
     letter_e_index = 5
     amount_of_letters_in_text = {
         'e': 0, 't': 0, 'o': 0, 'a': 0, 'i': 0, 'n': 0, 'h': 0, 's': 0, 'r': 0, 'd': 0,
