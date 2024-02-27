@@ -24,26 +24,26 @@ Encryption/Decryption in python using Caesar cipher
         except ValueError:
             print('Provide only number associated with modes provided above')
 
-def mode_1(alphabet) -> None:
+def mode_1(alphabet: list[str]) -> None:
     shift = get_shift_from_user()
     shifted_alphabet = key(alphabet, shift)
     text = get_text_from_user()
     encoded_text = encode(text, shifted_alphabet, alphabet)
     save_text(''.join(encoded_text))
 
-def mode_2(alphabet) -> None:
+def mode_2(alphabet: list[str]) -> None:
     shift = get_shift_from_user()
     text = get_text_from_user()
     shifted_alphabet = key(alphabet, shift)
     decoded_text = decode_from_key(text, shifted_alphabet, alphabet)
     save_text(''.join(decoded_text))
 
-def mode_3(alphabet) -> None:
+def mode_3(alphabet: list[str]) -> None:
     text = get_text_from_user()
     brute_force_texts = decode_brute_force(text, alphabet)
     save_text(''.join(brute_force_texts))
 
-def mode_4(alphabet) -> None:
+def mode_4(alphabet: list[str]) -> None:
     text = get_text_from_user()
     frequency_analysis = method_for_long_texts(text, alphabet)
     save_text(''.join(frequency_analysis))
@@ -69,7 +69,7 @@ def get_text_from_user() -> str:
     file.close()
     return user_input
 
-def save_text(text) -> None:
+def save_text(text: str) -> None:
     path_to_file = os.path.dirname(__file__)
     path_to_file = os.path.join(path_to_file, 'output.txt')
     with open(path_to_file, 'w') as file:
@@ -110,7 +110,7 @@ def decode_from_key(text: str, key: list[str], alphabet: list[str]) -> list[str]
         counter += 1
     return decoded_text
 
-def brute_force(text, alphabet, spacing) -> list[str]:
+def brute_force(text: str, alphabet: list[str], spacing: str) -> list[str]:
     decoded_text = [''] * len(text)
     brute_force_tries = [''] * len(alphabet)
     for i in range(len(alphabet)):
@@ -142,7 +142,7 @@ def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
         decoded_text = brute_force(text, alphabet, spacing)
     return decoded_text
 
-def method_for_long_texts(text, alphabet):
+def method_for_long_texts(text: str, alphabet: list[str]) -> list[str]:
     letter_e_index = 5
     amount_of_letters_in_text = {
         'e': 0, 't': 0, 'o': 0, 'a': 0, 'i': 0, 'n': 0, 'h': 0, 's': 0, 'r': 0, 'd': 0,
