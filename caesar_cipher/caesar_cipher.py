@@ -1,8 +1,15 @@
 import os
 
 def get_mode_from_user() -> int:
+    message = '''
+Encryption/Decryption in python using Caesar cipher
+[1 -> encrypt]
+[2 -> decrypt from key]
+[3 -> brute force decrypt]
+[4 -> decrypt using frequency analysis]
+:'''
     while True:
-        user_inp = input("Encryption/Decryption in python using Caesar cipher\n[1 -> encrypt]\n[2 -> decrypt from key]\n[3 -> brute force decrypt]\n:")
+        user_inp = input(message)
         try:
             user_inp = int(user_inp)
             if user_inp == 1:
@@ -10,6 +17,8 @@ def get_mode_from_user() -> int:
             if user_inp == 2:
                 return user_inp
             if user_inp == 3:
+                return user_inp
+            if user_inp == 4:
                 return user_inp
             print('Provide only number associated with modes provided above')
         except ValueError:
@@ -33,6 +42,11 @@ def mode_3(alphabet) -> None:
     text = get_text_from_user()
     brute_force_texts = decode_brute_force(text, alphabet)
     save_text(''.join(brute_force_texts))
+
+def mode_4(alphabet) -> None:
+    text = get_text_from_user()
+    frequency_analysis = method_for_long_texts(text, alphabet)
+    save_text(''.join(frequency_analysis))
 
 def get_shift_from_user() -> int:
     alphabet_len = 26
@@ -129,76 +143,22 @@ def decode_brute_force(text: str, alphabet: list[str]) -> list[str]:
     return decoded_text
 
 def method_for_long_texts(text, alphabet):
-    frequency_of_letters = {  # noqa: F841
-        'e': 12.137,
-        't': 8.939,
-        'o': 7.997,
-        'a': 7.879,
-        'i': 6.810,
-        'n': 6.565,
-        'h': 6.384,
-        's': 6.337,
-        'r': 5.970,
-        'd': 4.229,
-        'l': 4.175,
-        'u': 3.143,
-        'm': 2.836,
-        'w': 2.459,
-        'c': 2.38,
-        'y': 2.297,
-        'f': 2.179,
-        'g': 1.870,
-        'p': 1.590,
-        'b': 1.562,
-        'v': 1.006,
-        'k': 0.841,
-        'x': 0.145,
-        'j': 0.135,
-        'q': 0.090,
-        'z': 0.043,
-    }
-
+    letter_e_index = 5
     amount_of_letters_in_text = {
-        'e': 0,
-        't': 0,
-        'a': 0,
-        'i': 0,
-        'o': 0,
-        'n': 0,
-        's': 0,
-        'h': 0,
-        'r': 0,
-        'd': 0,
-        'l': 0,
-        'c': 0,
-        'u': 0,
-        'm': 0,
-        'w': 0,
-        'f': 0,
-        'g': 0,
-        'y': 0,
-        'p': 0,
-        'b': 0,
-        'v': 0,
-        'k': 0,
-        'x': 0,
-        'j': 0,
-        'q': 0,
-        'z': 0,
-    }
-
-    # research for frequency of letters in most popular books on almost 13_624_683 characters
+        'e': 0, 't': 0, 'o': 0, 'a': 0, 'i': 0, 'n': 0, 'h': 0, 's': 0, 'r': 0, 'd': 0,
+        'l': 0, 'u': 0, 'm': 0, 'w': 0, 'c': 0, 'y': 0, 'f': 0, 'g': 0, 'p': 0, 'b': 0,
+        'v': 0, 'k': 0, 'x': 0, 'j': 0, 'q': 0, 'z': 0 }
     for letter in text:
         letter = letter.lower()
         if letter in alphabet:
             amount_of_letters_in_text[letter] = amount_of_letters_in_text[letter] + 1
     amount_of_letters_in_text = dict(sorted(amount_of_letters_in_text.items(), key=lambda item: item[1], reverse=True))
-    sum_of_letter = 0
-    for key, value in amount_of_letters_in_text.items():
-        sum_of_letter += value
-    for key, value in amount_of_letters_in_text.items():
-        print(f'\'{key}\': {round(((value / sum_of_letter)*100), 3)}')
-    print(sum_of_letter)
+    for i in range(26):
+        if list(amount_of_letters_in_text.keys())[0] == alphabet[i]:
+            shift = i + 1 - letter_e_index
+    shifted_alphabet = key(alphabet, shift)
+    decoded_text = decode_from_key(text, shifted_alphabet, alphabet)
+    return decoded_text
 
 def main() -> None:
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
@@ -210,8 +170,8 @@ def main() -> None:
         mode_2(alphabet)
     elif mode == 3:
         mode_3(alphabet)
-    # text = get_text_from_user()
-    # method_for_long_texts(text, alphabet)
+    elif mode == 4:
+        mode_4(alphabet)
 
 if __name__ == "__main__":
     main()
