@@ -36,6 +36,21 @@ def encode(text: str, key: list[str], alphabet: list[str]) -> list[str]:
         counter += 1
     return encoded_text
 
+def decode_from_key(text: str, key: list[str], alphabet: list[str]) -> list[str]:
+    decoded_text = [''] * len(text)
+    counter = 0
+    special_characters = ' .,?!;:-!@#$%^&*()=+_\\[]{};\'\"<>?/~`1234567890'
+    for letter in text:
+        if letter.lower() in special_characters:
+            decoded_text[counter] = letter
+        else:
+            if letter.islower():
+                decoded_text[counter] = alphabet[key.index(letter)]
+            else:
+                decoded_text[counter] = alphabet[key.index(letter.lower())].upper()
+        counter += 1
+    return decoded_text
+
 def main() -> None:
     alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
@@ -43,7 +58,9 @@ def main() -> None:
     shifted_alphabet = key(alphabet, shift)
     text = get_text_from_user()
     encoded_text = encode(text, shifted_alphabet, alphabet)
-    print(''.join(encoded_text))
+    decoded_text = decode_from_key(''.join(encoded_text), shifted_alphabet, alphabet)
+    print(f'Encoded text: {''.join(encoded_text)}')
+    print(f'Decoded text: {''.join(decoded_text)}')
 
 if __name__ == "__main__":
     main()
