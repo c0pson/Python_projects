@@ -106,16 +106,13 @@ def password_label_con(content_frame, my_font_x21):
     button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
     button.pack(side='right', padx=8, pady=10)
 
-def password_strength_check():
-    ...
-
-def load_from_file():
+def load_from_file(button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame):
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
     with open(path,'r') as file:
         lines = file.readlines()
         for i, line in enumerate(lines):
             if i % 2 == 0:
-                print(line)
+                add_from_file(line.strip('\n'), button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame)
 
 def load_info(content_frame, my_font_x21):
     for child in content_frame.winfo_children():
@@ -129,10 +126,19 @@ def add(label_name_entry, button_index_2, password_index_frame, my_font_x21, but
         label_name_entry.delete('0', 'end')
         if label_name == '' or label_name in button_index_2:
             return
-        new_label=ctk.CTkButton(master=password_index_frame, text=label_name,
-                                font=my_font_x21, corner_radius=5, fg_color=Colors.PINK,
-                                border_color=Colors.TEXT_COLOR, border_width=2, hover_color=Colors.DARK_PINK,
-                                text_color=Colors.TEXT_COLOR, command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21))
+        new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK,
+                                border_color=Colors.TEXT_COLOR, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.TEXT_COLOR,
+                                command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21))
+        new_label.pack(expand=True, fill='both', padx=1, pady=1)
+        button_index.append(new_label)
+        button_index_2.append(label_name)
+
+def add_from_file(label_name, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame):
+        if label_name == '' or label_name in button_index_2:
+            return
+        new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK,
+                                border_color=Colors.TEXT_COLOR, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.TEXT_COLOR,
+                                command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21))
         new_label.pack(expand=True, fill='both', padx=1, pady=1)
         button_index.append(new_label)
         button_index_2.append(label_name)
@@ -202,6 +208,8 @@ def after_login(app):
     content_frame = ctk.CTkFrame(master=main_frame, corner_radius=7, fg_color=Colors.YELLOW,
                                 border_color=Colors.TEXT_COLOR, border_width=3)
     content_frame.pack(side='right', expand=True, fill='both', padx=8, pady=8)
+
+    load_from_file(button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame)
 
 def main():
     app = ctk.CTk()
