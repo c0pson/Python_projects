@@ -1,5 +1,6 @@
 import customtkinter as ctk
 from PIL import Image
+import pyperclip
 
 def login_proc(app, password_box):
     password = password_box.get()
@@ -32,7 +33,7 @@ def pop_up_dialog(app, button_index_2, my_font_x32, my_font_x16):
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\error-7-512-1390027183.png'
     my_image = ctk.CTkImage(dark_image=Image.open(path), size=(100,100))
     pop_up = ctk.CTkInputDialog(text='Provide title for label', title='Test', font=my_font_x16)
-    pop_up.geometry(f'280x180+{x-140}+{y-100}')
+    pop_up.geometry(f'280x180+{x}+{y-100}')
     label_name = str(pop_up.get_input())
     if label_name in button_index_2:
         toplevel = ctk.CTkToplevel()
@@ -48,10 +49,21 @@ def pop_up_dialog(app, button_index_2, my_font_x32, my_font_x16):
         return ''
     return label_name
 
+def edit_label(label, edit_button):
+    if edit_button.cget('text') == 'Edit':
+        label.configure(state='normal')
+        edit_button.configure(text='Save')
+    else:
+        label.configure(state='disabled')
+        edit_button.configure(text='Edit')
+
+def copy_label(label):
+    pyperclip.copy(str(label.get()))
+
 def load_info(content_frame, current_label, my_font_x32, my_font_x21):
     for child in content_frame.winfo_children():
         child.destroy()
-    title_label = ctk.CTkLabel(master=content_frame, corner_radius=5, text=' '+''.join(current_label), font=my_font_x32, fg_color='#7D7C7C', anchor='w')
+    title_label = ctk.CTkLabel(master=content_frame, corner_radius=5, text=' '+''.join(current_label), font=my_font_x32, fg_color='#7D7C7C')
     title_label.pack(side='top', fill='x', padx=5, pady=5)
 
     url_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
@@ -60,29 +72,31 @@ def load_info(content_frame, current_label, my_font_x32, my_font_x21):
     url_text = ctk.CTkLabel(master=url_frame, text=' URL: ', font=my_font_x32)
     url_text.pack(side='left', padx=2, pady=10)
 
-    url_label = ctk.CTkEntry(master=url_frame, height=48, font=my_font_x32)
+    url_label = ctk.CTkEntry(master=url_frame, height=48, font=my_font_x32, state='disabled')
     url_label.pack(side='left', pady=10, fill='x', expand=True)
 
-    save_button = ctk.CTkButton(master=url_frame, corner_radius=5, text='Edit', height=48, font=my_font_x21)
-    save_button.pack(side='right', padx=8, pady=10)
+    edit_1_button = ctk.CTkButton(master=url_frame, corner_radius=5,
+                                text='Edit', height=48, font=my_font_x21,
+                                command=lambda: edit_label(url_label, edit_1_button))
+    edit_1_button.pack(side='right', padx=8, pady=10)
 
-    copy_button = ctk.CTkButton(master=url_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
-    copy_button.pack(side='right', padx=16, pady=10)
+    copy_1_button = ctk.CTkButton(master=url_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21, command=lambda: copy_label(url_label))
+    copy_1_button.pack(side='right', padx=16, pady=10)
 
     pass_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
     pass_frame.pack(side='top', padx=5, pady=3, fill='x')
 
-    url_text = ctk.CTkLabel(master=pass_frame, text=' Password: ', font=my_font_x32)
-    url_text.pack(side='left', padx=2, pady=10)
+    pass_text = ctk.CTkLabel(master=pass_frame, text=' Password: ', font=my_font_x32)
+    pass_text.pack(side='left', padx=2, pady=10)
 
-    url_label = ctk.CTkEntry(master=pass_frame, height=48, font=my_font_x32)
-    url_label.pack(side='left', pady=10, fill='x', expand=True)
+    pass_label = ctk.CTkEntry(master=pass_frame, height=48, font=my_font_x32)
+    pass_label.pack(side='left', pady=10, fill='x', expand=True)
 
-    save_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Edit', height=48, font=my_font_x21)
-    save_button.pack(side='right', padx=8, pady=10)
+    edit_2_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Edit', height=48, font=my_font_x21)
+    edit_2_button.pack(side='right', padx=8, pady=10)
 
-    copy_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
-    copy_button.pack(side='right', padx=16, pady=10)
+    copy_2_button = ctk.CTkButton(master=pass_frame, corner_radius=5, text='Copy', height=48, font=my_font_x21)
+    copy_2_button.pack(side='right', padx=16, pady=10)
 
     buttons_frame = ctk.CTkFrame(master=content_frame, corner_radius=5)
     buttons_frame.pack(side='top', padx=5, pady=3, fill='both', expand=True)
