@@ -55,38 +55,53 @@ def login_page(app, my_font, my_font_2):
                                 hover_color=Colors.DARK_PINK, command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame))
     login_button.pack(padx=10, pady=15)
 
-def edit_label(label, edit_button):
+def edit_label(label, edit_button, current_label, button_index_2 , text):
     if edit_button.cget('text') == 'Edit':
         label.configure(state='normal')
         edit_button.configure(text='Save')
     else:
         label.configure(state='disabled')
         edit_button.configure(text='Edit')
+        if text.cget('text') == 'Name:':
+            edit_info(int(button_index_2.index(current_label[0])*4+2), label.get())
+        if text.cget('text') == 'Link:':
+            edit_info(int(button_index_2.index(current_label[0])*4+3), label.get())
+        if text.cget('text') == 'Pass:':
+            edit_info(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def copy_label(label):
+    print(label)
     pyperclip.copy(str(label.get()))
 
 def get_label_info(name) -> list[str] | None:
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
     with open(path, 'r') as file:
         found = False
-        for line in file:
+        next_lines = []
+        for index, line in enumerate(file, start=1):
             if found:
-                return line.strip().split(', ')
+                next_lines.append(line.strip())
+                if len(next_lines) == 3:
+                    return next_lines
             if name in line:
                 found = True
+            if index % 4 == 0:
+                found = False
+                next_lines = []
 
-def username_label_con(content_frame, my_font_x21, info):
-    frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
+def username_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
+    frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND,
+                        border_color=Colors.GRAPHITE, border_width=3)
     frame.pack(side='top', padx=10, pady=10, fill='x')
     text = ctk.CTkLabel(master=frame, text='Name:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text.pack(side='left', padx=8, pady=10)
-    label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=3, text_color=Colors.GRAPHITE)
+    label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN,
+                        border_color=Colors.GRAPHITE, border_width=3, text_color=Colors.GRAPHITE)
     label.insert('0', info)
     label.configure(state='disabled')
     label.pack(side='left', padx=8, pady=10, fill='x', expand=True)
     edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button),
+                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
@@ -94,17 +109,18 @@ def username_label_con(content_frame, my_font_x21, info):
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
 
-def url_label_con(content_frame, my_font_x21, info):
+def url_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
     frame.pack(side='top', padx=10, pady=0, fill='x')
     text = ctk.CTkLabel(master=frame, text='Link:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text.pack(side='left', padx=8, pady=10)
-    label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=3, text_color=Colors.GRAPHITE)
+    label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE,
+                        border_width=3, text_color=Colors.GRAPHITE)
     label.insert('0', info)
     label.configure(state='disabled')
     label.pack(side='left', padx=8, pady=10, fill='x', expand=True)
     edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button),
+                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
@@ -112,7 +128,7 @@ def url_label_con(content_frame, my_font_x21, info):
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
 
-def password_label_con(content_frame, my_font_x21, info):
+def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
     frame.pack(side='top', padx=10, pady=10, fill='x')
     text = ctk.CTkLabel(master=frame, text='Pass:', font=my_font_x21, text_color=Colors.GRAPHITE)
@@ -122,7 +138,7 @@ def password_label_con(content_frame, my_font_x21, info):
     label.configure(state='disabled')
     label.pack(side='left', padx=8, pady=10, fill='x', expand=True)
     edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button),
+                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
@@ -135,40 +151,44 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
     with open(path,'r') as file:
         lines = file.readlines()
         for i, line in enumerate(lines):
-            if i % 2 == 0:
+            if i % 4 == 0:
                 add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0)
         file.close()
 
-def append_file(label_name):
+def append_file(data):
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
     with open(path, 'a') as file:
-        file.write(f'{label_name}\n\n')
+        file.write(f'{data}{'\n'*4}')
     file.close()
 
 def remove_from_file(line_numbers):
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
     with open(path, 'r') as file:
         lines = file.readlines()
-
-    # Remove the specified line numbers
     remaining_lines = [line for i, line in enumerate(lines, start=1) if i not in line_numbers]
-
-    # Write the remaining lines back to the file
     with open(path, 'w') as file:
         file.writelines(remaining_lines)
+
+def edit_info(line_number, data):
+    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    with open(path, 'r') as file:
+        lines = file.readlines()
+        lines[line_number - 1] = data + '\n'
+    with open(path, 'w') as file:
+        file.writelines(lines)
 
 def load_info(content_frame, my_font_x21, current_label, button_index_2):
     for child in content_frame.winfo_children():
         child.destroy()
     info: list[str] | None = get_label_info(current_label[0])
     if info and info != ['']:
-        username_label_con(content_frame, my_font_x21, info[0])
-        url_label_con(content_frame, my_font_x21, info[1])
-        password_label_con(content_frame, my_font_x21, info[2])
+        username_label_con(content_frame, my_font_x21, info[0], current_label, button_index_2)
+        url_label_con(content_frame, my_font_x21, info[1], current_label, button_index_2)
+        password_label_con(content_frame, my_font_x21, info[2], current_label, button_index_2)
     else:
-        username_label_con(content_frame, my_font_x21, '')
-        url_label_con(content_frame, my_font_x21, '')
-        password_label_con(content_frame, my_font_x21, '')
+        username_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
+        url_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
+        password_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
 
 def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, to_append_file):
     label_name_entry.delete('0', 'end')
@@ -184,14 +204,14 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
         append_file(button_index_2[-1])
 
 def remove(current_label, button_index, button_index_2, content_frame):
+    line_num = int(button_index_2.index(current_label[0])*4+1)
     if current_label[0] != '':
         destroy_old_page(content_frame)
         button_index[int(button_index_2.index(current_label[0]))].destroy()
-        remove_from_file({int(button_index_2.index(current_label[0])*2+1), int(button_index_2.index(current_label[0])*2+2)})
+        remove_from_file({line_num, line_num+1, line_num+2, line_num+3})
         button_index.pop(int(button_index_2.index(current_label[0])))
         button_index_2.pop(int(button_index_2.index(current_label[0])))
     current_label[0] = ''
-
 
 def button_clicked(label, current_label, button_index, button_index_2, content_frame, my_font_x21):
     if current_label[0] != '':
@@ -266,7 +286,6 @@ def main():
     app_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=0)
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
     login_page(app_frame, my_font_x32, my_font_x16)
-
     app.mainloop()
 
 if __name__ == "__main__":
