@@ -40,7 +40,7 @@ def password(label, app, app_frame, my_font, my_font_2):
         file.write(f'{password}')
     encrypt_file_(resource_path('storage\\marker.marker'))
     destroy_old_page(app)
-    login_page(app, my_font_2, my_font)
+    login_page(app, my_font_2, my_font, was_first_time=[1])
 
 def encrypt_file_(file_path):
     key = generate_key()
@@ -112,8 +112,7 @@ def read_file():
         data = file.read()
         return data.decode()
 
-def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame):
-    was_first_time = [1]
+def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time):
     def decrypt_password(encrypted_password):
         key = load_keys().encode()
         fernet = Fernet(key)
@@ -147,7 +146,7 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame):
         wrong_pass_label.configure(text_color=Colors.GRAPHITE)
         app.after(3000, lambda: hide_label(wrong_pass_frame, wrong_pass_label))
 
-def login_page(app, my_font, my_font_2):
+def login_page(app, my_font, my_font_2, was_first_time):
     flag = [0]
     def show_password(entry_label, flag):
         if flag[0] == 0:
@@ -183,7 +182,7 @@ def login_page(app, my_font, my_font_2):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE,
                                 corner_radius=10, text='Login', font=my_font, border_color=Colors.GRAPHITE, border_width=2,
-                                hover_color=Colors.DARK_PINK, command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame))
+                                hover_color=Colors.DARK_PINK, command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time))
     login_button.pack(padx=10, pady=15)
 
 def edit_label(label, edit_button, current_label, button_index_2 , text):
@@ -450,7 +449,7 @@ def main():
     if not os.path.exists(resource_path('storage\\marker.marker')):
         set_password(app_frame, app_frame, my_font_x16, my_font_x32)
     else:
-        login_page(app_frame, my_font_x32, my_font_x16)
+        login_page(app_frame, my_font_x32, my_font_x16, was_first_time=[0])
     app.mainloop()
 
 if __name__ == "__main__":
