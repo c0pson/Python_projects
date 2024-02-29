@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from enum import Enum
 import pyperclip
+import os
+from cryptography.fernet import Fernet
 
 class Colors (str, Enum):
     BLUE_BACKGROUND = '#B5C0D0'
@@ -63,18 +65,36 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         label.configure(state='disabled')
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
-            edit_info(int(button_index_2.index(current_label[0])*4+2), label.get())
+            edit_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
         if text.cget('text') == 'Link:':
-            edit_info(int(button_index_2.index(current_label[0])*4+3), label.get())
+            edit_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
         if text.cget('text') == 'Pass:':
-            edit_info(int(button_index_2.index(current_label[0])*4+4), label.get())
+            edit_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
+
+def encrypt_file(file_path, cipher):
+    with open(file_path, 'rb') as file:
+        data = file.read()
+    encrypted_data = cipher.encrypt(data)
+    with open(file_path + '.enc', 'wb') as encrypted_file:
+        encrypted_file.write(encrypted_data)
+    with open(file_path, 'w+') as file:
+        file.truncate(0)
+
+def decrypt_file(file_path, cipher):
+    with open(file_path, 'rb') as encrypted_file:
+        encrypted_data = encrypted_file.read()
+    decrypted_data = cipher.decrypt(encrypted_data)
+    encrypted_file.close()
+    with open(file_path[:-4], 'wb') as decrypted_file:
+        decrypted_file.write(decrypted_data)
+    decrypted_file.close()
 
 def copy_label(label):
-    print(label)
     pyperclip.copy(str(label.get()))
 
 def get_label_info(name) -> list[str] | None:
-    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
     with open(path, 'r') as file:
         found = False
         next_lines = []
@@ -101,8 +121,9 @@ def username_label_con(content_frame, my_font_x21, info, current_label, button_i
     label.configure(state='disabled')
     label.pack(side='left', padx=8, pady=10, fill='x', expand=True)
     edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
-                                border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
+                                hover_color=Colors.DARK_PINK, font=my_font_x21, border_width=3,
+                                command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
+                                border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
                                 hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: copy_label(label),
@@ -119,8 +140,8 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
     label.insert('0', info)
     label.configure(state='disabled')
     label.pack(side='left', padx=8, pady=10, fill='x', expand=True)
-    edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, font=my_font_x21, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
+    edit_button = ctk.CTkButton(master=frame, corner_radius=5, text='Edit', height=48, fg_color=Colors.PINK, font=my_font_x21,
+                                hover_color=Colors.DARK_PINK, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
@@ -147,7 +168,8 @@ def password_label_con(content_frame, my_font_x21, info, current_label, button_i
     copy_button.pack(side='right', padx=8, pady=10)
 
 def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame):
-    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
     with open(path,'r') as file:
         lines = file.readlines()
         for i, line in enumerate(lines):
@@ -156,21 +178,24 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
         file.close()
 
 def append_file(data):
-    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
     with open(path, 'a') as file:
         file.write(f'{data}{'\n'*4}')
     file.close()
 
 def remove_from_file(line_numbers):
-    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
     with open(path, 'r') as file:
         lines = file.readlines()
     remaining_lines = [line for i, line in enumerate(lines, start=1) if i not in line_numbers]
     with open(path, 'w') as file:
         file.writelines(remaining_lines)
 
-def edit_info(line_number, data):
-    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+def edit_info_in_file(line_number, data):
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
     with open(path, 'r') as file:
         lines = file.readlines()
         lines[line_number - 1] = data + '\n'
@@ -275,6 +300,11 @@ def after_login(app):
     load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
 
 def main():
+    path = os.path.dirname(__file__)
+    path = os.path.join(path, 'storage.txt')
+    your_key = b'dxD6YsfWQAR1rB0BPhTal0mPRvZeoe7owv3WQrlsKnw='
+    cipher = Fernet(your_key)
+    decrypt_file(path+'.enc', cipher)
     app = ctk.CTk()
     app.title('Password manager')
     app.iconbitmap('password_manager\\resources\\icon.ico')
@@ -287,6 +317,7 @@ def main():
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
     login_page(app_frame, my_font_x32, my_font_x16)
     app.mainloop()
+    encrypt_file(path, cipher)
 
 if __name__ == "__main__":
     main()
