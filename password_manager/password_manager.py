@@ -17,6 +17,23 @@ class Colors (str, Enum):
     RED = '#D04848'
     TRANSPARENT = 'transparent'
 
+def refresh_files(file_path):
+    file = open(file_path)
+    file.close() 
+
+def load_keys():
+    file = open(resource_path('storage\\keys.txt'), 'r')
+    file.close()
+    with open(resource_path('storage\\keys.txt'), 'r') as file:
+        key = file.readline()
+    return key
+
+def generate_key():
+    key = Fernet.generate_key()
+    with open(resource_path('storage\\keys.txt'), 'w') as file:
+        file.write(key.decode())
+    return key
+
 def password(label, app, app_frame, my_font, my_font_2):
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
@@ -24,10 +41,9 @@ def password(label, app, app_frame, my_font, my_font_2):
     encrypt_file_(resource_path('storage\\marker.marker'))
     destroy_old_page(app)
     login_page(app, my_font_2, my_font)
-    return
 
 def encrypt_file_(file_path):
-    key = b'dxD6YsfWQAR1rB0BPhTal4mPRvZeoe7owv3WQrlsKnw='
+    key = generate_key()
     cipher = Fernet(key)
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -36,42 +52,40 @@ def encrypt_file_(file_path):
         encrypted_file.write(encrypted_data)
 
 def set_password(app, app_frame, my_font, my_font_2):
-    if not os.path.exists(resource_path('storage\\marker.marker')):
-        my_font_x27 = ctk.CTkFont(family='Hack Nerd Font Propo', size=27)
-        flag = [0]
-        my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
+    my_font_x27 = ctk.CTkFont(family='Hack Nerd Font Propo', size=27)
+    flag = [0]
+    my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
 
-        def show_password(entry_label, flag):
-            if flag[0] == 0:
-                entry_label.configure(show='')
-                flag[0] = 1
-            else:
-                entry_label.configure(show='*')
-                flag[0] = 0
+    def show_password(entry_label, flag):
+        if flag[0] == 0:
+            entry_label.configure(show='')
+            flag[0] = 1
+        else:
+            entry_label.configure(show='*')
+            flag[0] = 0
 
-        app_frame = ctk.CTkFrame(master=app, corner_radius=10, fg_color=Colors.YELLOW, border_color=Colors.GRAPHITE, border_width=3)
-        app_frame.pack(expand=True, padx=0, pady=0)
+    app_frame = ctk.CTkFrame(master=app, corner_radius=10, fg_color=Colors.YELLOW, border_color=Colors.GRAPHITE, border_width=3)
+    app_frame.pack(expand=True, padx=0, pady=0)
 
-        label = ctk.CTkLabel(master=app_frame, text='Insert password:', font=my_font_x27, text_color=Colors.GRAPHITE)
-        label.pack(side='top', expand=True, fill='x', padx=23, pady=20)
+    label = ctk.CTkLabel(master=app_frame, text='Insert password:', font=my_font_x27, text_color=Colors.GRAPHITE)
+    label.pack(side='top', expand=True, fill='x', padx=23, pady=20)
 
-        entry_label = ctk.CTkEntry(master=app_frame, width=44, font=my_font_x27, fg_color=Colors.GREEN, text_color=Colors.GRAPHITE, show='*', border_width=2, border_color=Colors.GRAPHITE)
-        entry_label.pack(side='top', expand=True, fill='x', padx=23, pady=0)
+    entry_label = ctk.CTkEntry(master=app_frame, width=44, font=my_font_x27, fg_color=Colors.GREEN, text_color=Colors.GRAPHITE, show='*', border_width=2, border_color=Colors.GRAPHITE)
+    entry_label.pack(side='top', expand=True, fill='x', padx=23, pady=0)
 
-        frame_for_buttons = ctk.CTkFrame(master=app_frame, height=20, fg_color=Colors.YELLOW)
-        frame_for_buttons.pack(side='bottom', expand=True, padx=23, pady=20, fill='x')
+    frame_for_buttons = ctk.CTkFrame(master=app_frame, height=20, fg_color=Colors.YELLOW)
+    frame_for_buttons.pack(side='bottom', expand=True, padx=23, pady=20, fill='x')
 
-        button = ctk.CTkCheckBox(master=frame_for_buttons, command=lambda: show_password(entry_label, flag),
-                                fg_color=Colors.PINK, hover=False, checkmark_color=Colors.DARK_PINK, text='Show password',
-                                text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
-        button.pack(side='left', expand=True, fill='x')
+    button = ctk.CTkCheckBox(master=frame_for_buttons, command=lambda: show_password(entry_label, flag),
+                            fg_color=Colors.PINK, hover=False, checkmark_color=Colors.DARK_PINK, text='Show password',
+                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
+    button.pack(side='left', expand=True, fill='x')
 
-        ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: password(entry_label, app, app_frame, my_font, my_font_2),
-                                fg_color=Colors.PINK, text='OK', width=60, hover_color=Colors.DARK_PINK,
-                                text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
-        ok_button.pack(side='left', fill='y')
-    else:
-        login_page(app, my_font_2, my_font)
+    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: password(entry_label, app, app_frame, my_font, my_font_2),
+                            fg_color=Colors.PINK, text='OK', width=60, hover_color=Colors.DARK_PINK,
+                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
+    ok_button.pack(side='left', fill='y')
+
 
 def destroy_old_page(page):
     for child in page.winfo_children():
@@ -99,9 +113,9 @@ def read_file():
         return data.decode()
 
 def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame):
-    key = b'dxD6YsfWQAR1rB0BPhTal4mPRvZeoe7owv3WQrlsKnw='
-
+    was_first_time = [1]
     def decrypt_password(encrypted_password):
+        key = load_keys().encode()
         fernet = Fernet(key)
         decrypted_password = fernet.decrypt(encrypted_password)
         return decrypted_password.decode()
@@ -124,7 +138,7 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame):
 
     if verify_password(password_box.get(), stored_hashed_password, stored_salt):
         destroy_old_page(app)
-        after_login(app)
+        after_login(app, was_first_time)
     else:
         password_box.delete('0', 'end')
         wrong_pass_frame.configure(fg_color=Colors.RED)
@@ -187,12 +201,12 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
             edit_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def encrypt_file(file_path, cipher):
-    with open(file_path + '.txt', 'rb') as file:
+    with open(file_path, 'rb') as file:
         data = file.read()
     encrypted_data = cipher.encrypt(data)
     with open(file_path + '.enc', 'wb') as encrypted_file:
         encrypted_file.write(encrypted_data)
-    with open(file_path + '.txt', 'w+') as file:
+    with open(file_path, 'w+') as file:
         file.truncate(0)
 
 def decrypt_pass(file_path, cipher):
@@ -206,10 +220,8 @@ def decrypt_file(file_path, cipher):
     with open(file_path + '.enc', 'rb') as encrypted_file:
         encrypted_data = encrypted_file.read()
     decrypted_data = cipher.decrypt(encrypted_data)
-    encrypted_file.close()
-    with open(file_path +'.txt', 'wb') as decrypted_file:
+    with open(file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
-    decrypted_file.close()
 
 def copy_label(label):
     pyperclip.copy(str(label.get()))
@@ -295,13 +307,12 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
         for i, line in enumerate(lines):
             if i % 4 == 0:
                 add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0)
-        file.close()
 
 def append_file(data):
+    refresh_files(resource_path('storage\\storage.txt'))
     path = resource_path('storage\\storage.txt')
     with open(path, 'a') as file:
         file.write(f'{data}{'\n'*4}')
-    file.close()
 
 def remove_from_file(line_numbers):
     path = resource_path('storage\\storage.txt')
@@ -365,7 +376,11 @@ def button_clicked(label, current_label, button_index, button_index_2, content_f
 def on_validate(d, i, P, s, S, v, V, W):
     return len(P) <= 14
 
-def after_login(app):
+def after_login(app, was_first_time):
+    refresh_files(resource_path('storage\\keys.txt'))
+    refresh_files(resource_path('storage\\storage.txt'))
+    refresh_files(resource_path('storage\\storage.txt.enc'))
+    refresh_files(resource_path('storage\\marker.marker'))
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     button_index = []
     button_index_2 = []
@@ -414,12 +429,14 @@ def after_login(app):
                                 text_color=Colors.GRAPHITE)
     remove_button.pack(side='top', fill='x', padx=10, pady=10)
 
+    if was_first_time[0] != 1:
+        key = load_keys().encode()
+        cipher = Fernet(key)
+        decrypt_file(resource_path('storage\\storage.txt'), cipher)
+    
     load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
 
 def main():
-    your_key = b'dxD6YsfWQAR1rB0BPhTal0mPRvZeoe7owv3WQrlsKnw='
-    cipher = Fernet(your_key)
-    decrypt_file(resource_path('storage\\storage'), cipher)
     app = ctk.CTk()
     app.title('Password manager')
     app.iconbitmap(resource_path('resources\\icon.ico'))
@@ -430,11 +447,12 @@ def main():
     app.geometry(f'1080x720+{x-540}+{y-400}')
     app_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=0)
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
-    set_password(app_frame, app_frame, my_font_x16, my_font_x32)
+    if not os.path.exists(resource_path('storage\\marker.marker')):
+        set_password(app_frame, app_frame, my_font_x16, my_font_x32)
+    else:
+        login_page(app_frame, my_font_x32, my_font_x16)
     app.mainloop()
 
 if __name__ == "__main__":
-    your_key = b'dxD6YsfWQAR1rB0BPhTal0mPRvZeoe7owv3WQrlsKnw='
-    cipher = Fernet(your_key)
     main()
-    encrypt_file(resource_path('storage\\storage'), cipher)
+    encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
