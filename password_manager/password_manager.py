@@ -66,7 +66,7 @@ def edit_label(label, edit_button):
 def copy_label(label):
     pyperclip.copy(str(label.get()))
 
-def get_label_info(name):
+def get_label_info(name) -> list[str] | None:
     path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
     with open(path, 'r') as file:
         found = False
@@ -136,7 +136,7 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
         lines = file.readlines()
         for i, line in enumerate(lines):
             if i % 2 == 0:
-                add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame)
+                add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0)
         file.close()
 
 def append_file(label_name):
@@ -145,11 +145,23 @@ def append_file(label_name):
         file.write(f'{label_name}\n\n')
     file.close()
 
+def remove_from_file(line_numbers):
+    path = 'C:\\Users\\piotr\\Documents\\Files\\python\\password_manager\\storage.txt'
+    with open(path, 'r') as file:
+        lines = file.readlines()
+
+    # Remove the specified line numbers
+    remaining_lines = [line for i, line in enumerate(lines, start=1) if i not in line_numbers]
+
+    # Write the remaining lines back to the file
+    with open(path, 'w') as file:
+        file.writelines(remaining_lines)
+
 def load_info(content_frame, my_font_x21, current_label, button_index_2):
     for child in content_frame.winfo_children():
         child.destroy()
-    info = get_label_info(current_label[0])
-    if info:
+    info: list[str] | None = get_label_info(current_label[0])
+    if info and info != ['']:
         username_label_con(content_frame, my_font_x21, info[0])
         url_label_con(content_frame, my_font_x21, info[1])
         password_label_con(content_frame, my_font_x21, info[2])
@@ -157,27 +169,29 @@ def load_info(content_frame, my_font_x21, current_label, button_index_2):
         username_label_con(content_frame, my_font_x21, '')
         url_label_con(content_frame, my_font_x21, '')
         password_label_con(content_frame, my_font_x21, '')
-        append_file(button_index_2[-1])
 
-def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame):
-        label_name_entry.delete('0', 'end')
-        if label_name == '' or label_name in button_index_2:
-            return
-        new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK, width=50,
-                                border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE,
-                                command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21))
-        new_label.pack(expand=True, fill='both', padx=1, pady=1)
-        button_index.append(new_label)
-        button_index_2.append(label_name)
-        print(button_index_2[-1])
+def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, to_append_file):
+    label_name_entry.delete('0', 'end')
+    if label_name == '' or label_name in button_index_2:
+        return
+    new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK, width=50,
+                            border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE,
+                            command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21))
+    new_label.pack(expand=True, fill='both', padx=1, pady=1)
+    button_index.append(new_label)
+    button_index_2.append(label_name)
+    if to_append_file:
+        append_file(button_index_2[-1])
 
 def remove(current_label, button_index, button_index_2, content_frame):
     if current_label[0] != '':
         destroy_old_page(content_frame)
         button_index[int(button_index_2.index(current_label[0]))].destroy()
+        remove_from_file({int(button_index_2.index(current_label[0])*2+1), int(button_index_2.index(current_label[0])*2+2)})
         button_index.pop(int(button_index_2.index(current_label[0])))
         button_index_2.pop(int(button_index_2.index(current_label[0])))
     current_label[0] = ''
+
 
 def button_clicked(label, current_label, button_index, button_index_2, content_frame, my_font_x21):
     if current_label[0] != '':
@@ -223,7 +237,7 @@ def after_login(app):
     label_name_entry.pack(side='top', fill='x', padx=10, pady=10)
 
     add_button = ctk.CTkButton(master=buttons_index_frame, text='Add', font=my_font_x21, height=38,
-                                command=lambda: add(str(label_name_entry.get()), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label,content_frame),
+                                command=lambda: add(str(label_name_entry.get()), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label,content_frame, 1),
                                 border_color=Colors.GRAPHITE, border_width=2, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE)
     add_button.pack(side='top', fill='x', padx=10, pady=0)
 
