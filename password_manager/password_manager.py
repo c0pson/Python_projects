@@ -17,9 +17,15 @@ class Colors (str, Enum):
     RED = '#D04848'
     TRANSPARENT = 'transparent'
 
-def refresh_files(file_path):
-    file = open(file_path)
-    file.close() 
+def check_req():
+    if not os.path.exists(resource_path('storage\\storage.txt')):
+        storage = open(resource_path('storage\\storage.txt'), 'w+')
+        storage.close()
+    if not os.path.exists(resource_path('storage\\storage.txt.enc')):
+        enc_storage = open(resource_path('storage\\storage.txt.enc'), 'w+')
+        enc_storage.close()
+    if not os.path.exists(resource_path('storage')):
+        os.makedirs(resource_path('storage'))
 
 def load_keys():
     file = open(resource_path('storage\\keys.txt'), 'r')
@@ -34,15 +40,15 @@ def generate_key():
         file.write(key.decode())
     return key
 
-def password(label, app, app_frame, my_font, my_font_2):
+def confirm_password(label, app, my_font, my_font_2):
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
         file.write(f'{password}')
-    encrypt_file_(resource_path('storage\\marker.marker'))
+    encrypt_marker_file(resource_path('storage\\marker.marker'))
     destroy_old_page(app)
     login_page(app, my_font_2, my_font, was_first_time=[1])
 
-def encrypt_file_(file_path):
+def encrypt_marker_file(file_path):
     key = generate_key()
     cipher = Fernet(key)
     with open(file_path, 'rb') as file:
@@ -54,7 +60,6 @@ def encrypt_file_(file_path):
 def set_password(app, app_frame, my_font, my_font_2):
     my_font_x27 = ctk.CTkFont(family='Hack Nerd Font Propo', size=27)
     flag = [0]
-    my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
 
     def show_password(entry_label, flag):
         if flag[0] == 0:
@@ -78,14 +83,13 @@ def set_password(app, app_frame, my_font, my_font_2):
 
     button = ctk.CTkCheckBox(master=frame_for_buttons, command=lambda: show_password(entry_label, flag),
                             fg_color=Colors.PINK, hover=False, checkmark_color=Colors.DARK_PINK, text='Show password',
-                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
+                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     button.pack(side='left', expand=True, fill='x')
 
-    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: password(entry_label, app, app_frame, my_font, my_font_2),
+    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: confirm_password(entry_label, app, my_font, my_font_2),
                             fg_color=Colors.PINK, text='OK', width=60, hover_color=Colors.DARK_PINK,
-                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font_x16)
+                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     ok_button.pack(side='left', fill='y')
-
 
 def destroy_old_page(page):
     for child in page.winfo_children():
@@ -155,7 +159,6 @@ def login_page(app, my_font, my_font_2, was_first_time):
         else:
             entry_label.configure(show='*')
             flag[0] = 0
-    my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
     login_frame = ctk.CTkFrame(master=app, corner_radius=10, border_width=2,
                                 fg_color=Colors.YELLOW, border_color=Colors.GRAPHITE)
     login_frame.pack(side='top', expand=True, padx=10, pady=10)
@@ -177,7 +180,7 @@ def login_page(app, my_font, my_font_2, was_first_time):
 
     button = ctk.CTkCheckBox(master=login_frame, command=lambda: show_password(password_box, flag),
                             fg_color=Colors.PINK, hover=False, checkmark_color=Colors.DARK_PINK, text='Show password',
-                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, font=my_font_x16)
+                            text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, font=my_font_2)
     button.pack(side='top', expand=True, fill='x', padx=15, pady=10)
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE,
@@ -193,11 +196,11 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         label.configure(state='disabled')
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
-            edit_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
-        if text.cget('text') == 'Link:':
-            edit_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
-        if text.cget('text') == 'Pass:':
-            edit_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
+            save_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
+        elif text.cget('text') == 'Link:':
+            save_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
+        elif text.cget('text') == 'Pass:':
+            save_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def encrypt_file(file_path, cipher):
     with open(file_path, 'rb') as file:
@@ -308,7 +311,6 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
                 add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0)
 
 def append_file(data):
-    refresh_files(resource_path('storage\\storage.txt'))
     path = resource_path('storage\\storage.txt')
     with open(path, 'a') as file:
         file.write(f'{data}{'\n'*4}')
@@ -321,7 +323,7 @@ def remove_from_file(line_numbers):
     with open(path, 'w') as file:
         file.writelines(remaining_lines)
 
-def edit_info_in_file(line_number, data):
+def save_info_in_file(line_number, data):
     path = resource_path('storage\\storage.txt')
     with open(path, 'r') as file:
         lines = file.readlines()
@@ -354,6 +356,7 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
     button_index_2.append(label_name)
     if to_append_file:
         append_file(button_index_2[-1])
+        button_index[-1].invoke()
 
 def remove(current_label, button_index, button_index_2, content_frame):
     line_num = int(button_index_2.index(current_label[0])*4+1)
@@ -376,10 +379,6 @@ def on_validate(d, i, P, s, S, v, V, W):
     return len(P) <= 14
 
 def after_login(app, was_first_time):
-    refresh_files(resource_path('storage\\keys.txt'))
-    refresh_files(resource_path('storage\\storage.txt'))
-    refresh_files(resource_path('storage\\storage.txt.enc'))
-    refresh_files(resource_path('storage\\marker.marker'))
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     button_index = []
     button_index_2 = []
@@ -436,6 +435,7 @@ def after_login(app, was_first_time):
     load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
 
 def main():
+    check_req()
     app = ctk.CTk()
     app.title('Password manager')
     app.iconbitmap(resource_path('resources\\icon.ico'))
