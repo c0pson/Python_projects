@@ -40,13 +40,13 @@ def generate_key():
         file.write(key.decode())
     return key
 
-def confirm_password(label, app, my_font, my_font_2):
+def confirm_password(label, app, my_font, my_font_2, login_success):
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
         file.write(f'{password}')
     encrypt_marker_file(resource_path('storage\\marker.marker'))
     destroy_old_page(app)
-    login_page(app, my_font_2, my_font, was_first_time=[1])
+    login_page(app, my_font_2, my_font, [1], login_success)
 
 def encrypt_marker_file(file_path):
     key = generate_key()
@@ -57,7 +57,7 @@ def encrypt_marker_file(file_path):
     with open(file_path, 'wb') as encrypted_file:
         encrypted_file.write(encrypted_data)
 
-def set_password(app, app_frame, my_font, my_font_2):
+def set_password(app, app_frame, my_font, my_font_2, login_success):
     my_font_x27 = ctk.CTkFont(family='Hack Nerd Font Propo', size=27)
     flag = [0]
 
@@ -86,7 +86,7 @@ def set_password(app, app_frame, my_font, my_font_2):
                             text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     button.pack(side='left', expand=True, fill='x')
 
-    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: confirm_password(entry_label, app, my_font, my_font_2),
+    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: confirm_password(entry_label, app, my_font, my_font_2, login_success),
                             fg_color=Colors.PINK, text='OK', width=60, hover_color=Colors.DARK_PINK,
                             text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     ok_button.pack(side='left', fill='y')
@@ -116,7 +116,7 @@ def read_file():
         data = file.read()
         return data.decode()
 
-def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time):
+def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success):
     def decrypt_password(encrypted_password):
         key = load_keys().encode()
         fernet = Fernet(key)
@@ -141,7 +141,7 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_
 
     if verify_password(password_box.get(), stored_hashed_password, stored_salt):
         destroy_old_page(app)
-        after_login(app, was_first_time)
+        after_login(app, was_first_time, login_success)
     else:
         password_box.delete('0', 'end')
         wrong_pass_frame.configure(fg_color=Colors.RED)
@@ -150,7 +150,7 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_
         wrong_pass_label.configure(text_color=Colors.GRAPHITE)
         app.after(3000, lambda: hide_label(wrong_pass_frame, wrong_pass_label))
 
-def login_page(app, my_font, my_font_2, was_first_time):
+def login_page(app, my_font, my_font_2, was_first_time, login_success):
     flag = [0]
     def show_password(entry_label, flag):
         if flag[0] == 0:
@@ -185,7 +185,7 @@ def login_page(app, my_font, my_font_2, was_first_time):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE,
                                 corner_radius=10, text='Login', font=my_font, border_color=Colors.GRAPHITE, border_width=2,
-                                hover_color=Colors.DARK_PINK, command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time))
+                                hover_color=Colors.DARK_PINK, command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success))
     login_button.pack(padx=10, pady=15)
 
 def edit_label(label, edit_button, current_label, button_index_2 , text):
@@ -300,7 +300,7 @@ def strength_set(password, bar):
     previous_char = ['']
     for character in password:
         if previous_char[0] == character:
-            strength -= 1
+            strength += 1
         if character in alphabet_l:
             lower_letters_counter += 1
         elif character in alphabet_u:
@@ -311,41 +311,41 @@ def strength_set(password, bar):
             special_characters_counter += 1
         previous_char[0] = character
         with open(resource_path('resources\\most_common_pass.txt'), 'r') as file:
-            common_pass = file.read()
-            if password in common_pass:
-                password_strength = 0
-                bar.set(password_strength)
-                return
-            for i in range(len(password)):
-                if common_pass in password[:-i]:
-                    in_common += 0.1
-                if common_pass in password[:i]:
-                    in_common += 0.1
-                if in_common >= 1:
-                    in_common = 0.5
+            if len(password) < 10:
+                for line in file:
+                    if line in password:
+                        in_common = 0.5
+                        break
     if special_characters_counter != 0:
-        first = ((numbers_counter / special_characters_counter) + (lower_letters_counter / special_characters_counter) + (upper_characters_counter / special_characters_counter))
+        first = (((numbers_counter/special_characters_counter)+(lower_letters_counter/special_characters_counter)+(upper_characters_counter/special_characters_counter)))*(len(password)-(2*in_common*(len(password))))
     else:
         first = 0.0
     if numbers_counter != 0:
-        second = ((special_characters_counter / numbers_counter) + (lower_letters_counter / numbers_counter) + (upper_characters_counter / numbers_counter))
+        second = (((special_characters_counter / numbers_counter) + (lower_letters_counter / numbers_counter) + (upper_characters_counter / numbers_counter)))*(len(password)-(in_common*2*(len(password))))
     else:
         second = 0.0
     if lower_letters_counter != 0:
-        third = ((special_characters_counter / lower_letters_counter) + (numbers_counter / lower_letters_counter) + (upper_characters_counter / lower_letters_counter))
+        third = (((special_characters_counter / lower_letters_counter) + (numbers_counter / lower_letters_counter) + (upper_characters_counter / lower_letters_counter)))*(len(password)-(in_common*2*(len(password))))
     else:
         third = 0.0
     if upper_characters_counter != 0:
-        fourth = ((numbers_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter))
+        fourth = (((special_characters_counter / upper_characters_counter) + (numbers_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter)))*(len(password)-(in_common*2*(len(password))))
     else:
         fourth = 0
-    password_strength = (((first) + (second) + (third) + fourth) * len(password) * 1.5) * ((special_characters_counter+special_characters_counter+lower_letters_counter) / 100)
+    password_strength = (((first*1.5) + (second*1.5) + (third*1.5) + (fourth*1.5)) * len(password)) * ((special_characters_counter+special_characters_counter+lower_letters_counter+upper_characters_counter) / 100)
+    if in_common == 0:
+        in_common = 1
     if len(password) >= 8:
-        password_strength *= 3
-    elif len(password) < 2:
+        password_strength *= 1.8
+    if len(password) >= 16:
+        password_strength *= 2.3
+    if len(password) < 8:
         password_strength /= 2
-    print(f'{password_strength * in_common / 100}%')
-    bar.set(password_strength / 100)
+    if len(password) <= 4:
+        password_strength /= 3
+    if strength > len(password) and password_strength < 0.5:
+        password_strength /= (strength)
+    bar.set((((password_strength * in_common)/(max(1, strength))) / 100)/16)
 
 def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
@@ -450,7 +450,7 @@ def button_clicked(label, current_label, button_index, button_index_2, content_f
 def on_validate(d, i, P, s, S, v, V, W):
     return len(P) <= 14
 
-def after_login(app, was_first_time):
+def after_login(app, was_first_time, login_success):
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     button_index = []
     button_index_2 = []
@@ -505,8 +505,10 @@ def after_login(app, was_first_time):
         decrypt_file(resource_path('storage\\storage.txt'), cipher)
     
     load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
+    login_success[0] = 1
 
 def main():
+    login_success = [0]
     check_req()
     app = ctk.CTk()
     app.title('Password manager')
@@ -519,11 +521,13 @@ def main():
     app_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=0)
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
     if not os.path.exists(resource_path('storage\\marker.marker')):
-        set_password(app_frame, app_frame, my_font_x16, my_font_x32)
+        set_password(app_frame, app_frame, my_font_x16, my_font_x32, login_success)
     else:
-        login_page(app_frame, my_font_x32, my_font_x16, was_first_time=[0])
+        login_page(app_frame, my_font_x32, my_font_x16, [0], login_success)
     app.mainloop()
+    print(login_success)
+    if login_success == 1:
+        encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
 
 if __name__ == "__main__":
     main()
-    encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
