@@ -1,2 +1,5 @@
 /.vscode
 /__pycache__
+/password_manager/build
+/password_manager/dist
+/password_manager/password_manager.spec

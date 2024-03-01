@@ -18,14 +18,14 @@ class Colors (str, Enum):
     TRANSPARENT = 'transparent'
 
 def check_req():
+    if not os.path.exists(resource_path('storage')):
+        os.makedirs(resource_path('storage'))
     if not os.path.exists(resource_path('storage\\storage.txt')):
         storage = open(resource_path('storage\\storage.txt'), 'w+')
         storage.close()
     if not os.path.exists(resource_path('storage\\storage.txt.enc')):
         enc_storage = open(resource_path('storage\\storage.txt.enc'), 'w+')
         enc_storage.close()
-    if not os.path.exists(resource_path('storage')):
-        os.makedirs(resource_path('storage'))
 
 def load_keys():
     file = open(resource_path('storage\\keys.txt'), 'r')
