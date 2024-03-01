@@ -317,19 +317,19 @@ def strength_set(password, bar):
                         in_common = 0.5
                         break
     if special_characters_counter != 0:
-        first = (((numbers_counter/special_characters_counter)+(lower_letters_counter/special_characters_counter)+(upper_characters_counter/special_characters_counter)))*(len(password)-(2*in_common*(len(password))))
+        first = ((numbers_counter+lower_letters_counter+upper_characters_counter)/special_characters_counter)
     else:
         first = 0.0
     if numbers_counter != 0:
-        second = (((special_characters_counter / numbers_counter) + (lower_letters_counter / numbers_counter) + (upper_characters_counter / numbers_counter)))*(len(password)-(in_common*2*(len(password))))
+        second = ((special_characters_counter + lower_letters_counter + upper_characters_counter) / numbers_counter)
     else:
         second = 0.0
     if lower_letters_counter != 0:
-        third = (((special_characters_counter / lower_letters_counter) + (numbers_counter / lower_letters_counter) + (upper_characters_counter / lower_letters_counter)))*(len(password)-(in_common*2*(len(password))))
+        third = ((special_characters_counter + numbers_counter + upper_characters_counter) / lower_letters_counter)
     else:
         third = 0.0
     if upper_characters_counter != 0:
-        fourth = (((special_characters_counter / upper_characters_counter) + (numbers_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter)))*(len(password)-(in_common*2*(len(password))))
+        fourth = ((special_characters_counter + numbers_counter + lower_letters_counter) / upper_characters_counter)
     else:
         fourth = 0
     password_strength = (((first*1.5) + (second*1.5) + (third*1.5) + (fourth*1.5)) * len(password)) * ((special_characters_counter+special_characters_counter+lower_letters_counter+upper_characters_counter) / 100)
@@ -345,7 +345,7 @@ def strength_set(password, bar):
         password_strength /= 3
     if strength > len(password) and password_strength < 0.5:
         password_strength /= (strength)
-    bar.set((((password_strength * in_common)/(max(1, strength))) / 100)/16)
+    bar.set((((password_strength * in_common)/(max(1, strength))) / 100))
 
 def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
