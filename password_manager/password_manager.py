@@ -1,6 +1,7 @@
 from cryptography.fernet import Fernet
 import customtkinter as ctk
 from enum import Enum
+from subprocess import call
 import pyperclip
 import hashlib
 import secrets
@@ -215,7 +216,6 @@ def decrypt_pass(file_path, cipher):
     with open(file_path, 'rb') as encrypted_file:
         encrypted_data = encrypted_file.read()
     decrypted_data = cipher.decrypt(encrypted_data)
-    print(decrypted_data)
     return decrypted_data
 
 def decrypt_file(file_path, cipher):
@@ -280,9 +280,12 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
     copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Open', fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: print('open in browser soon'),
+                                hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: open_in_browser(label.get()),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
+
+def open_in_browser(link):
+    call(['C:\\Program Files\\Mozilla Firefox\\Firefox.exe', '-new-tab', link])
 
 def strength_set(password, bar):
     password_strength = 0
@@ -292,6 +295,10 @@ def strength_set(password, bar):
     upper_characters_counter = 0
     strength = 0
     in_common = 0
+    first = 0.0
+    second = 0.0
+    third = 0.0
+    fourth = 0.0
     alphabet_l = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
                     'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ]
     alphabet_u = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
@@ -316,10 +323,6 @@ def strength_set(password, bar):
                 if line in password:
                     in_common = 0.5
                     break
-    first = 0.0
-    second = 0.0
-    third = 0.0
-    fourth = 0.0
     if special_characters_counter != 0:
         first = ((numbers_counter+lower_letters_counter+upper_characters_counter)/special_characters_counter)
     if numbers_counter != 0:
@@ -337,7 +340,7 @@ def strength_set(password, bar):
         password_strength *= 2.3
     if strength > len(password) and password_strength < 0.5:
         password_strength -= strength * 0.04
-    bar.set((((password_strength * in_common)/(max(1, strength))) / 100))
+    bar.set((((password_strength * in_common)) / 100))
 
 def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
@@ -383,7 +386,6 @@ def remove_from_file(line_numbers):
     with open(path, 'r') as file:
         lines = file.readlines()
     remaining_lines = [line for i, line in enumerate(lines, start=1) if i not in line_numbers]
-    print(remaining_lines)
     with open(path, 'w') as file:
         file.writelines(remaining_lines)
 
