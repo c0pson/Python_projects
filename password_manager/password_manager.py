@@ -247,7 +247,7 @@ def get_label_info(name) -> list[str] | None:
 def username_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND,
                         border_color=Colors.GRAPHITE, border_width=3)
-    frame.pack(side='top', padx=10, pady=10, fill='x')
+    frame.pack(side='top', padx=10, pady=0, fill='x')
     text = ctk.CTkLabel(master=frame, text='Name:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text.pack(side='left', padx=8, pady=10)
     label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN,
@@ -267,7 +267,7 @@ def username_label_con(content_frame, my_font_x21, info, current_label, button_i
 
 def url_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
-    frame.pack(side='top', padx=10, pady=0, fill='x')
+    frame.pack(side='top', padx=10, pady=10, fill='x')
     text = ctk.CTkLabel(master=frame, text='Link:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text.pack(side='left', padx=8, pady=10)
     label = ctk.CTkEntry(master=frame, height=48, font=my_font_x21, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE,
@@ -279,8 +279,8 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
                                 hover_color=Colors.DARK_PINK, command=lambda: edit_label(label, edit_button, current_label, button_index_2, text),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     edit_button.pack(side='right', padx=8, pady=10)
-    copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Copy', fg_color=Colors.PINK,
-                                hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: copy_label(label),
+    copy_button = ctk.CTkButton(master=frame, corner_radius=5, text='Open', fg_color=Colors.PINK,
+                                hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: print('open in browser soon'),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
 
@@ -310,41 +310,33 @@ def strength_set(password, bar):
         else:
             special_characters_counter += 1
         previous_char[0] = character
-        with open(resource_path('resources\\most_common_pass.txt'), 'r') as file:
-            if len(password) < 10:
-                for line in file:
-                    if line in password:
-                        in_common = 0.5
-                        break
+    with open(resource_path('resources\\most_common_pass.txt'), 'r') as file:
+        if len(password) < 10:
+            for line in file:
+                if line in password:
+                    in_common = 0.5
+                    break
+    first = 0.0
+    second = 0.0
+    third = 0.0
+    fourth = 0.0
     if special_characters_counter != 0:
         first = ((numbers_counter+lower_letters_counter+upper_characters_counter)/special_characters_counter)
-    else:
-        first = 0.0
     if numbers_counter != 0:
         second = ((special_characters_counter + lower_letters_counter + upper_characters_counter) / numbers_counter)
-    else:
-        second = 0.0
     if lower_letters_counter != 0:
         third = ((special_characters_counter + numbers_counter + upper_characters_counter) / lower_letters_counter)
-    else:
-        third = 0.0
     if upper_characters_counter != 0:
         fourth = ((special_characters_counter + numbers_counter + lower_letters_counter) / upper_characters_counter)
-    else:
-        fourth = 0
     password_strength = (((first*1.5) + (second*1.5) + (third*1.5) + (fourth*1.5)) * len(password)) * ((special_characters_counter+special_characters_counter+lower_letters_counter+upper_characters_counter) / 100)
     if in_common == 0:
         in_common = 1
-    if len(password) >= 8:
-        password_strength *= 1.8
     if len(password) >= 16:
         password_strength *= 2.3
-    if len(password) < 8:
-        password_strength /= 2
-    if len(password) <= 4:
-        password_strength /= 3
+    elif len(password) >= 8:
+        password_strength *= 2.3
     if strength > len(password) and password_strength < 0.5:
-        password_strength /= (strength)
+        password_strength -= strength * 0.04
     bar.set((((password_strength * in_common)/(max(1, strength))) / 100))
 
 def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
@@ -408,12 +400,12 @@ def load_info(content_frame, my_font_x21, current_label, button_index_2):
         child.destroy()
     info: list[str] | None = get_label_info(current_label[0])
     if info and info != ['']:
-        username_label_con(content_frame, my_font_x21, info[0], current_label, button_index_2)
         url_label_con(content_frame, my_font_x21, info[1], current_label, button_index_2)
+        username_label_con(content_frame, my_font_x21, info[0], current_label, button_index_2)
         password_label_con(content_frame, my_font_x21, info[2], current_label, button_index_2)
     else:
-        username_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
         url_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
+        username_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
         password_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
 
 def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, to_append_file):
@@ -525,8 +517,7 @@ def main():
     else:
         login_page(app_frame, my_font_x32, my_font_x16, [0], login_success)
     app.mainloop()
-    print(login_success)
-    if login_success == 1:
+    if login_success[0] == 1:
         encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
 
 if __name__ == "__main__":
