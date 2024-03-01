@@ -197,9 +197,9 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
             save_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
-        elif text.cget('text') == 'Link:':
+        if text.cget('text') == 'Link:':
             save_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
-        elif text.cget('text') == 'Pass:':
+        if text.cget('text') == 'Pass:':
             save_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def encrypt_file(file_path, cipher):
@@ -284,6 +284,69 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
 
+def strength_set(password, bar):
+    password_strength = 0
+    special_characters_counter = 0
+    numbers_counter = 0
+    lower_letters_counter = 0
+    upper_characters_counter = 0
+    strength = 0
+    in_common = 0
+    alphabet_l = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' ]
+    alphabet_u = [ 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' ]
+    numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
+    previous_char = ['']
+    for character in password:
+        if previous_char[0] == character:
+            strength -= 1
+        if character in alphabet_l:
+            lower_letters_counter += 1
+        elif character in alphabet_u:
+            upper_characters_counter += 1
+        elif character in numbers:
+            numbers_counter+= 1
+        else:
+            special_characters_counter += 1
+        previous_char[0] = character
+        with open(resource_path('resources\\most_common_pass.txt'), 'r') as file:
+            common_pass = file.read()
+            if password in common_pass:
+                password_strength = 0
+                bar.set(password_strength)
+                return
+            for i in range(len(password)):
+                if common_pass in password[:-i]:
+                    in_common += 0.1
+                if common_pass in password[:i]:
+                    in_common += 0.1
+                if in_common >= 1:
+                    in_common = 0.5
+    if special_characters_counter != 0:
+        first = ((numbers_counter / special_characters_counter) + (lower_letters_counter / special_characters_counter) + (upper_characters_counter / special_characters_counter))
+    else:
+        first = 0.0
+    if numbers_counter != 0:
+        second = ((special_characters_counter / numbers_counter) + (lower_letters_counter / numbers_counter) + (upper_characters_counter / numbers_counter))
+    else:
+        second = 0.0
+    if lower_letters_counter != 0:
+        third = ((special_characters_counter / lower_letters_counter) + (numbers_counter / lower_letters_counter) + (upper_characters_counter / lower_letters_counter))
+    else:
+        third = 0.0
+    if upper_characters_counter != 0:
+        fourth = ((numbers_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter) + (lower_letters_counter / upper_characters_counter))
+    else:
+        fourth = 0
+    password_strength = (((first) + (second) + (third) + fourth) * len(password) * 1.5) * ((special_characters_counter+special_characters_counter+lower_letters_counter) / 100)
+    if len(password) >= 8:
+        password_strength *= 3
+    elif len(password) < 2:
+        password_strength /= 2
+    print(f'{password_strength * in_common / 100}%')
+    bar.set(password_strength / 100)
+
 def password_label_con(content_frame, my_font_x21, info, current_label, button_index_2):
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
     frame.pack(side='top', padx=10, pady=10, fill='x')
@@ -301,6 +364,14 @@ def password_label_con(content_frame, my_font_x21, info, current_label, button_i
                                 hover_color=Colors.DARK_PINK, height=48, font=my_font_x21, command=lambda: copy_label(label),
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     copy_button.pack(side='right', padx=8, pady=10)
+    frame_1 = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
+    frame_1.pack(side='top', padx=10, pady=0, fill='x')
+    text_1 = ctk.CTkLabel(master=frame_1, text='Strength:', font=my_font_x21, text_color=Colors.GRAPHITE)
+    text_1.pack(side='left', padx=10, pady=10)
+    strength_bar = ctk.CTkProgressBar(master=frame_1, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=2, progress_color=Colors.DARK_PINK, height=20)
+    strength_set(label.get(), strength_bar)
+    strength_bar.pack(side='left', padx=8, pady=10, fill='x', expand=True)
+    label.bind("<KeyRelease>", lambda bar: strength_set(label.get(), bar = strength_bar))
 
 def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame):
     path = resource_path('storage\\storage.txt')
@@ -320,6 +391,7 @@ def remove_from_file(line_numbers):
     with open(path, 'r') as file:
         lines = file.readlines()
     remaining_lines = [line for i, line in enumerate(lines, start=1) if i not in line_numbers]
+    print(remaining_lines)
     with open(path, 'w') as file:
         file.writelines(remaining_lines)
 
