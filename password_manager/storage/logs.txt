@@ -1,0 +1,32 @@
+Log  1: 02 March 2024 22:54:14 | App opened | id: 5124
+Log  2: 02 March 2024 23:01:11 | App opened | id: 17880
+Log  3: 02 March 2024 23:01:13 | Logged in | id: 17880
+Log  4: 02 March 2024 23:01:13 | Decrypted storage | id: 17880
+Log  5: 02 March 2024 23:01:45 | Encrypted data | id: 17880
+Log  6: 02 March 2024 23:01:45 | Closed app | id: 17880
+Log  7: 02 March 2024 23:01:54 | App opened | id: 18496
+Log  8: 02 March 2024 23:01:58 | Logged in | id: 18496
+Log  9: 02 March 2024 23:01:58 | Decrypted storage | id: 18496
+Log 10: 02 March 2024 23:02:10 | Edited link in pinterest | id: 18496
+Log 11: 02 March 2024 23:02:24 | Edited password in youtube | id: 18496
+Log 12: 02 March 2024 23:02:34 | Added new password | id: 18496
+Log 13: 02 March 2024 23:03:27 | Removed password | id: 18496
+Log 14: 02 March 2024 23:03:39 | Encrypted data | id: 18496
+Log 15: 02 March 2024 23:03:39 | Closed app | id: 18496
+Log 16: 02 March 2024 23:06:09 | App opened | id: 17936
+Log 17: 02 March 2024 23:06:43 | Wrong password was entered: test | id: 17936
+Log 18: 02 March 2024 23:07:07 | Logged in | id: 17936
+Log 19: 02 March 2024 23:07:08 | Decrypted storage | id: 17936
+Log 20: 02 March 2024 23:07:20 | Edited link in youtube | id: 17936
+Log 21: 02 March 2024 23:07:27 | Edited named in youtube | id: 17936
+Log 22: 02 March 2024 23:07:47 | Edited named in pinterest | id: 17936
+Log 23: 02 March 2024 23:07:56 | Edited password in pinterest | id: 17936
+Log 24: 02 March 2024 23:08:14 | Added new password google | id: 17936
+Log 25: 02 March 2024 23:08:17 | Removed password google | id: 17936
+Log 26: 02 March 2024 23:09:52 | Encrypted data | id: 17936
+Log 27: 02 March 2024 23:09:52 | Closed app | id: 17936
+Log 28: 02 March 2024 23:09:57 | App opened | id: 19312
+Log 29: 02 March 2024 23:10:04 | Logged in | id: 19312
+Log 30: 02 March 2024 23:10:04 | Decrypted storage | id: 19312
+Log 31: 02 March 2024 23:10:59 | Encrypted data | id: 19312
+Log 32: 02 March 2024 23:10:59 | Closed app | id: 19312
