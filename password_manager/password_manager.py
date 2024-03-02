@@ -116,7 +116,7 @@ def read_file():
         data = file.read()
         return data.decode()
 
-def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success):
+def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success, my_font):
     def decrypt_password(encrypted_password):
         key = load_keys().encode()
         fernet = Fernet(key)
@@ -143,12 +143,7 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_
         destroy_old_page(app)
         after_login(app, was_first_time, login_success)
     else:
-        password_box.delete('0', 'end')
-        wrong_pass_frame.configure(fg_color=Colors.RED)
-        wrong_pass_frame.configure(border_width=3)
-        wrong_pass_frame.configure(border_color=Colors.GRAPHITE)
-        wrong_pass_label.configure(text_color=Colors.GRAPHITE)
-        app.after(1500, lambda: hide_label(wrong_pass_frame, wrong_pass_label))
+        display_error(app, my_font, 'Wrong Password')
 
 def login_page(app, my_font, my_font_2, was_first_time, login_success):
     flag = [0]
@@ -185,7 +180,7 @@ def login_page(app, my_font, my_font_2, was_first_time, login_success):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, text='Login',
                                 corner_radius=10, font=my_font, border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK,
-                                command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success))
+                                command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success, my_font_2))
     login_button.pack(padx=10, pady=15)
 
 def edit_label(label, edit_button, current_label, button_index_2 , text):
@@ -531,7 +526,7 @@ def add_from_search(password_index_frame, label_name, my_font_x21, button_index,
     button_index.append(new_label)
     button_index_2.append(label_name)
 
-def display_error(event, app, my_font):
+def display_error(app, my_font, my_text):
     message = []
     half_width = app.winfo_width() // 2
     half_height = app.winfo_height() // 2
@@ -539,10 +534,15 @@ def display_error(event, app, my_font):
         message[1].destroy()
     except IndexError:
         pass
-    frame_for_error = ctk.CTkFrame(master=app, fg_color=Colors.RED, border_color=Colors.GRAPHITE, border_width=3, width=200, height=(half_height // 10), bg_color=Colors.YELLOW)
-    label = ctk.CTkLabel(master=frame_for_error, text='No results', font=my_font, text_color=Colors.GRAPHITE)
-    frame_for_error.place(x=half_width, y=half_height // 12)
-    label.pack(padx=4, pady=4)
+    color = Colors.YELLOW
+    space = 0
+    if my_text == 'Wrong Password':
+        color = Colors.BLUE_BACKGROUND
+        space = 75
+    frame_for_error = ctk.CTkFrame(master=app, fg_color=Colors.RED, border_color=Colors.GRAPHITE, border_width=3, width=200, height=(half_height // 10), bg_color=color)
+    label = ctk.CTkLabel(master=frame_for_error, text=my_text, font=my_font, text_color=Colors.GRAPHITE)
+    frame_for_error.place(x=half_width-space, y=half_height // 12)
+    label.pack(padx=10, pady=10)
     message.append(frame_for_error)
     app.after(1500, lambda: frame_for_error.destroy())
 
@@ -573,7 +573,7 @@ def search_for_label(button_index, button_index_2, password_index_frame, search,
             items_to_show_2 = []
             current_label[0] = ''
         else:
-            display_error(None, app, my_font_x21)
+            display_error(app, my_font_x21, 'Not found!')
     else:
         destroy_old_page(password_index_frame)
         button_index = []
