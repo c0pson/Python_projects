@@ -60,14 +60,14 @@ def generate_key():
         file.write(key.decode())
     return key
 
-def confirm_password(label, app, my_font, my_font_2, login_success):
+def confirm_password(label, app_frame, my_font, my_font_2, login_success, app):
     logs(f'Set up new password | id: {os.getpid()}')
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
         file.write(f'{password}')
     encrypt_marker_file(resource_path('storage\\marker.marker'))
     destroy_old_page(app)
-    login_page(app, my_font_2, my_font, [1], login_success)
+    login_page(app_frame, my_font_2, my_font, [1], login_success, app)
 
 def encrypt_marker_file(file_path):
     key = generate_key()
@@ -107,7 +107,7 @@ def set_password(app, app_frame, my_font, my_font_2, login_success):
                             text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     button.pack(side='left', expand=True, fill='x')
 
-    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: confirm_password(entry_label, app, my_font, my_font_2, login_success),
+    ok_button = ctk.CTkButton(master=frame_for_buttons, command=lambda: confirm_password(entry_label, app, my_font, my_font_2, login_success, app),
                             fg_color=Colors.PINK, text='OK', width=60, hover_color=Colors.DARK_PINK,
                             text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2, font=my_font)
     ok_button.pack(side='left', fill='y')
@@ -128,7 +128,7 @@ def read_file():
         data = file.read()
         return data.decode()
 
-def login_proc(app, password_box, was_first_time, login_success, my_font):
+def login_proc(app_frame, password_box, was_first_time, login_success, my_font, app):
     def decrypt_password(encrypted_password):
         key = load_keys().encode()
         fernet = Fernet(key)
@@ -153,13 +153,13 @@ def login_proc(app, password_box, was_first_time, login_success, my_font):
 
     if verify_password(password_box.get(), stored_hashed_password, stored_salt):
         logs(f'Logged in | id: {os.getpid()}')
-        destroy_old_page(app)
-        after_login(app, was_first_time, login_success)
+        destroy_old_page(app_frame)
+        after_login(app_frame, was_first_time, login_success, app)
     else:
         logs(f'Wrong password was entered: {password_box.get()} | id: {os.getpid()}')
-        display_error(app, my_font, 'Wrong Password')
+        display_error(app_frame, my_font, 'Wrong Password')
 
-def login_page(app, my_font, my_font_2, was_first_time, login_success):
+def login_page(app_frame, my_font, my_font_2, was_first_time, login_success, app):
     flag = [0]
     def show_password(entry_label, flag):
         if flag[0] == 0:
@@ -168,7 +168,7 @@ def login_page(app, my_font, my_font_2, was_first_time, login_success):
         else:
             entry_label.configure(show='*')
             flag[0] = 0
-    login_frame = ctk.CTkFrame(master=app, corner_radius=10, border_width=2,
+    login_frame = ctk.CTkFrame(master=app_frame, corner_radius=10, border_width=3,
                                 fg_color=Colors.YELLOW, border_color=Colors.GRAPHITE)
     login_frame.pack(side='top', expand=True, padx=10, pady=10)
 
@@ -187,7 +187,7 @@ def login_page(app, my_font, my_font_2, was_first_time, login_success):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, text='Login',
                                 corner_radius=10, font=my_font, border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK,
-                                command=lambda: login_proc(app, password_box, was_first_time, login_success, my_font_2))
+                                command=lambda: login_proc(app_frame, password_box, was_first_time, login_success, my_font_2, app))
     login_button.pack(padx=10, pady=15)
 
 def edit_label(label, edit_button, current_label, button_index_2 , text):
@@ -597,21 +597,21 @@ def search_for_label(button_index, button_index_2, password_index_frame, search,
         load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
         password_index_frame.focus()
 
-def after_login(app, was_first_time, login_success):
+def after_login(app_frame, was_first_time, login_success, app):
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     button_index = []
     button_index_2 = []
     current_label = ['']  
 
-    main_frame = ctk.CTkFrame(master=app, corner_radius=0, fg_color=Colors.BLUE_BACKGROUND)
+    main_frame = ctk.CTkFrame(master=app_frame, corner_radius=0, fg_color=Colors.BLUE_BACKGROUND)
     main_frame.pack(side='left', expand=True, fill='both', padx=0, pady=0)
 
     index_frame = ctk.CTkFrame(master=main_frame, corner_radius=7, fg_color=Colors.BLUE_BACKGROUND)
-    index_frame.pack(side='left', fill='both', padx=8, pady=8)
+    index_frame.pack(side='left', fill='both', padx=8, pady=0)
 
     search_frame = ctk.CTkFrame(master=index_frame, corner_radius=7, border_color=Colors.GRAPHITE,
                                 border_width=3, fg_color=Colors.YELLOW)
-    search_frame.pack(side='top', fill='both', padx=0, pady=0)
+    search_frame.pack(side='top', fill='both', padx=0, pady=8)
 
     search_frame_2 = ctk.CTkFrame(master=search_frame, fg_color=Colors.YELLOW, corner_radius=7)
     search_frame_2.pack(side='top', fill='both', padx=10, pady=8)
@@ -625,18 +625,15 @@ def after_login(app, was_first_time, login_success):
 
     frame_for_border = ctk.CTkFrame(master=index_frame, corner_radius=7, border_color=Colors.GRAPHITE,
                                     fg_color=Colors.YELLOW, border_width=3)
-    frame_for_border.pack(side='top', expand=True, fill='both', padx=0, pady=8)
+    frame_for_border.pack(side='top', expand=True, fill='both', padx=0, pady=0)
 
     password_index_frame = ctk.CTkScrollableFrame(master=frame_for_border, corner_radius=7, scrollbar_button_hover_color=Colors.DARK_PINK,
                                                 scrollbar_button_color=Colors.DARK_PINK, fg_color=Colors.YELLOW)
     password_index_frame.pack(side='top', expand=True, fill='both', padx=4, pady=4)
 
-    spacing_frame  = ctk.CTkFrame(master=index_frame, height=10, fg_color=Colors.TRANSPARENT)
-    spacing_frame.pack()
-
     buttons_index_frame = ctk.CTkFrame(master=index_frame, corner_radius=7, border_color=Colors.GRAPHITE,
                                         border_width=3, fg_color=Colors.YELLOW)
-    buttons_index_frame.pack(side='bottom', fill='x', padx=0, pady=0)
+    buttons_index_frame.pack(side='bottom', fill='x', padx=0, pady=8)
 
     validate_cmd = buttons_index_frame.register(on_validate)
     label_name_entry = ctk.CTkEntry(master=buttons_index_frame, font=my_font_x21, height=38, fg_color=Colors.GREEN,
@@ -653,7 +650,7 @@ def after_login(app, was_first_time, login_success):
 
     content_frame = ctk.CTkFrame(master=main_frame, corner_radius=7, fg_color=Colors.YELLOW,
                                 border_color=Colors.GRAPHITE, border_width=3)
-    content_frame.pack(side='right', expand=True, fill='both', padx=8, pady=8)
+    content_frame.pack(side='top', expand=True, fill='both', padx=8, pady=8)
 
     remove_button = ctk.CTkButton(master=buttons_index_frame, text='Remove',
                                 font=my_font_x21, height=38, command=lambda: remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search_label.get(), label_name_entry, app),
@@ -661,6 +658,13 @@ def after_login(app, was_first_time, login_success):
                                 fg_color=Colors.PINK, hover_color=Colors.DARK_PINK,
                                 text_color=Colors.GRAPHITE)
     remove_button.pack(side='top', fill='x', padx=10, pady=10)
+
+    dashboard_frame = ctk.CTkFrame(master=main_frame, fg_color=Colors.YELLOW, border_color=Colors.GRAPHITE, border_width=3)
+    dashboard_frame.pack(side='top', padx=8, pady=8, fill='x')
+
+    exit_button = ctk.CTkButton(master=dashboard_frame, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text='Exit', command=lambda: app.destroy(),
+                                font=my_font_x21, text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=2)
+    exit_button.pack(side='top', padx=10, pady=10)
 
     if was_first_time[0] != 1:
         key = load_keys().encode()
@@ -682,13 +686,13 @@ def main():
     my_font_x16 = ctk.CTkFont(family='Hack Nerd Font Propo', size=16)
     my_font_x32 = ctk.CTkFont(family='Hack Nerd Font Propo', size=32)
     app.geometry(f'1080x720+{x-540}+{y-400}')
-    app.minsize(width=900, height=540)
+    app.minsize(width=900, height=680)
     app_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=0)
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
     if not os.path.exists(resource_path('storage\\marker.marker')):
         set_password(app_frame, app_frame, my_font_x16, my_font_x32, login_success)
     else:
-        login_page(app_frame, my_font_x32, my_font_x16, [0], login_success)
+        login_page(app_frame, my_font_x32, my_font_x16, [0], login_success, app)
     app.mainloop()
     if login_success[0] == 1:
         encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
