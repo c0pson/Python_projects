@@ -1,5 +1,6 @@
 from string import ascii_letters, digits, punctuation
 from cryptography.fernet import Fernet
+from datetime import datetime
 import customtkinter as ctk
 from subprocess import call
 from enum import Enum
@@ -7,6 +8,7 @@ import pyperclip
 import hashlib
 import secrets
 import random
+import time
 import sys
 import os
 
@@ -29,6 +31,21 @@ def check_req():
     if not os.path.exists(resource_path('storage\\storage.txt.enc')):
         enc_storage = open(resource_path('storage\\storage.txt.enc'), 'w+')
         enc_storage.close()
+    if not os.path.exists(resource_path('storage\\logs.txt')):
+        log_files = open(resource_path('storage\\logs.txt'), 'w+')
+        log_files.close()
+
+def logs(info):
+    length = 0
+    with open(resource_path('storage\\logs.txt'), 'r') as file:
+        length = len(file.readlines()) + 1
+    if length < 10:
+        length = str(f' {length}')
+    with open(resource_path('storage\\logs.txt'), 'a') as file:
+        now = time.time()
+        date = datetime.fromtimestamp(now)
+        log_message = f'Log {length}: {date.strftime('%d %B %Y %H:%M:%S')} | {info}\n'
+        file.write(log_message)
 
 def load_keys():
     file = open(resource_path('storage\\keys.txt'), 'r')
@@ -44,6 +61,7 @@ def generate_key():
     return key
 
 def confirm_password(label, app, my_font, my_font_2, login_success):
+    logs(f'Set up new password | id: {os.getpid()}')
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
         file.write(f'{password}')
@@ -105,18 +123,12 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
 
-def hide_label(wrong_pass_frame, wrong_pass_label):
-    wrong_pass_frame.configure(fg_color=Colors.BLUE_BACKGROUND)
-    wrong_pass_frame.configure(border_width=3)
-    wrong_pass_frame.configure(border_color=Colors.BLUE_BACKGROUND)
-    wrong_pass_label.configure(text_color=Colors.BLUE_BACKGROUND)
-
 def read_file():
     with open(resource_path('storage\\marker.marker'), 'rb') as file:
         data = file.read()
         return data.decode()
 
-def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success, my_font):
+def login_proc(app, password_box, was_first_time, login_success, my_font):
     def decrypt_password(encrypted_password):
         key = load_keys().encode()
         fernet = Fernet(key)
@@ -140,9 +152,11 @@ def login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_
     stored_hashed_password, stored_salt = hash_password(password_str)
 
     if verify_password(password_box.get(), stored_hashed_password, stored_salt):
+        logs(f'Logged in | id: {os.getpid()}')
         destroy_old_page(app)
         after_login(app, was_first_time, login_success)
     else:
+        logs(f'Wrong password was entered: {password_box.get()} | id: {os.getpid()}')
         display_error(app, my_font, 'Wrong Password')
 
 def login_page(app, my_font, my_font_2, was_first_time, login_success):
@@ -166,13 +180,6 @@ def login_page(app, my_font, my_font_2, was_first_time, login_success):
                                 corner_radius=10, font=my_font, show='*', text_color=Colors.GRAPHITE)
     password_box.pack(padx=15, pady=0)
 
-    wrong_pass_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=10)
-    wrong_pass_frame.pack(side='bottom', pady=20)
-
-    wrong_pass_label = ctk.CTkLabel(master=wrong_pass_frame, text='WRONG PASSWORD',
-                                    text_color=Colors.BLUE_BACKGROUND, font=my_font_2)
-    wrong_pass_label.pack(padx=40, pady=10)
-
     button = ctk.CTkCheckBox(master=login_frame, command=lambda: show_password(password_box, flag),
                             fg_color=Colors.PINK, hover=False, checkmark_color=Colors.DARK_PINK, text='Show password',
                             text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, font=my_font_2)
@@ -180,7 +187,7 @@ def login_page(app, my_font, my_font_2, was_first_time, login_success):
 
     login_button = ctk.CTkButton(master=login_frame, width=120, height=50, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, text='Login',
                                 corner_radius=10, font=my_font, border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK,
-                                command=lambda: login_proc(app, password_box, wrong_pass_label, wrong_pass_frame, was_first_time, login_success, my_font_2))
+                                command=lambda: login_proc(app, password_box, was_first_time, login_success, my_font_2))
     login_button.pack(padx=10, pady=15)
 
 def edit_label(label, edit_button, current_label, button_index_2 , text):
@@ -191,10 +198,13 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         label.configure(state='disabled')
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
+            logs(f'Edited named in {current_label[0]} | id: {os.getpid()}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
         if text.cget('text') == 'Link:':
+            logs(f'Edited link in {current_label[0]} | id: {os.getpid()}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
         if text.cget('text') == 'Pass:':
+            logs(f'Edited password in {current_label[0]} | id: {os.getpid()}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def encrypt_file(file_path, cipher):
@@ -205,6 +215,7 @@ def encrypt_file(file_path, cipher):
         encrypted_file.write(encrypted_data)
     with open(file_path, 'w+') as file:
         file.truncate(0)
+    logs(f'Encrypted data | id: {os.getpid()}')
 
 def decrypt_pass(file_path, cipher):
     with open(file_path, 'rb') as encrypted_file:
@@ -218,6 +229,7 @@ def decrypt_file(file_path, cipher):
     decrypted_data = cipher.decrypt(encrypted_data)
     with open(file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
+    logs(f'Decrypted storage | id: {os.getpid()}')
 
 def copy_label(label):
     pyperclip.copy(str(label.get()))
@@ -280,6 +292,7 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
 
 def open_in_browser(link):
     call(['C:\\Program Files\\Mozilla Firefox\\Firefox.exe', '-new-tab', link])
+    logs(f'Opened link {link} | id: {os.getpid()}')
 
 def strength_set(password, label, bar):
     password_strength = 0
@@ -488,6 +501,7 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
     button_index_2.append(label_name)
     if to_append_file:
         label_name_entry.delete('0', 'end')
+        logs(f'Added new password {label_name} | id: {os.getpid()}')
         append_file(button_index_2[-1])
         destroy_old_page(password_index_frame)
         button_index = []
@@ -497,6 +511,7 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
         password_index_frame.focus()
 
 def remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search, label_name_entry, app):
+    logs(f'Removed password {current_label[0]} | id: {os.getpid()}')
     line_num = int(button_index_2.index(current_label[0])*4+1)
     if current_label[0] != '':
         destroy_old_page(content_frame)
@@ -573,6 +588,7 @@ def search_for_label(button_index, button_index_2, password_index_frame, search,
             items_to_show_2 = []
             current_label[0] = ''
         else:
+            destroy_old_page(content_frame)
             display_error(app, my_font_x21, 'Not found!')
     else:
         destroy_old_page(password_index_frame)
@@ -585,7 +601,7 @@ def after_login(app, was_first_time, login_success):
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     button_index = []
     button_index_2 = []
-    current_label = ['']
+    current_label = ['']  
 
     main_frame = ctk.CTkFrame(master=app, corner_radius=0, fg_color=Colors.BLUE_BACKGROUND)
     main_frame.pack(side='left', expand=True, fill='both', padx=0, pady=0)
@@ -655,6 +671,7 @@ def after_login(app, was_first_time, login_success):
     login_success[0] = 1
 
 def main():
+    logs(f'App opened | id: {os.getpid()}')
     login_success = [0]
     check_req()
     app = ctk.CTk()
@@ -675,6 +692,7 @@ def main():
     app.mainloop()
     if login_success[0] == 1:
         encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
+    logs(f'Closed app | id: {os.getpid()}')
 
 if __name__ == "__main__":
     main()
