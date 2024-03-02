@@ -387,7 +387,7 @@ def password_label_con(content_frame, my_font_x21, info, current_label, button_i
     frame_1.pack(side='top', padx=10, pady=0, fill='x')
     text_1 = ctk.CTkLabel(master=frame_1, text='Strength:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text_1.pack(side='left', padx=10, pady=10)
-    strength_bar = ctk.CTkProgressBar(master=frame_1, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=2, progress_color=Colors.PINK, height=20)
+    strength_bar = ctk.CTkProgressBar(master=frame_1, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=3, progress_color=Colors.PINK, height=20)
     strength_bar.pack(side='left', padx=8, pady=10, fill='x', expand=True)
     frame_2 = ctk.CTkFrame(master=frame_1, border_width=3, border_color=Colors.GRAPHITE, fg_color=Colors.PINK, corner_radius=5)
     frame_2.pack(side='left', fill='x', padx=8, pady=10)
@@ -422,7 +422,7 @@ def generate_password_con(content_frame, my_font_x21):
     space.pack(side='right')
     length_label = ctk.CTkLabel(master=length_info_frame, font=my_font_x21, text_color=Colors.GRAPHITE)
     length_label.pack(padx=4, pady=4)
-    slider = ctk.CTkSlider(master=frame_1, from_=1, to=25, number_of_steps=24, border_width=2, progress_color=Colors.PINK, height=22,
+    slider = ctk.CTkSlider(master=frame_1, from_=1, to=25, number_of_steps=24, border_width=3, progress_color=Colors.PINK, height=22,
                             border_color=Colors.GRAPHITE, fg_color=Colors.GREEN, hover=False, button_color=Colors.GRAPHITE,
                             command=lambda label: update_length(length_label, slider.get()))
     slider.pack(side='right', expand=True, padx=0, pady=0, fill='x')
@@ -508,7 +508,6 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
         button_index_2 = []
         load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
         button_index[-1].invoke()
-        password_index_frame.focus()
 
 def remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search, label_name_entry, app):
     logs(f'Removed password {current_label[0]} | id: {os.getpid()}')
