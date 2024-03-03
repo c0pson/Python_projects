@@ -1,0 +1,19 @@
+Log  1: 03 March 2024 00:22:45 | id: 11968 | App opened
+Log  2: 03 March 2024 00:22:47 | id: 11968 | Logged in
+Log  3: 03 March 2024 00:22:48 | id: 11968 | Decrypted storage data
+Log  4: 03 March 2024 00:23:14 | id: 11968 | Encrypted storage data
+Log  5: 03 March 2024 00:23:14 | id: 11968 | Closed app
+Log  6: 03 March 2024 00:23:21 | id: 9680 | App opened
+Log  7: 03 March 2024 00:23:29 | id: 9680 | Logged in
+Log  8: 03 March 2024 00:23:29 | id: 9680 | Decrypted storage data
+Log  9: 03 March 2024 00:23:36 | id: 9680 | Encrypted storage data
+Log 10: 03 March 2024 00:23:41 | id: 9680 | Logged in
+Log 11: 03 March 2024 00:23:41 | id: 9680 | Decrypted storage data
+Log 12: 03 March 2024 00:23:42 | id: 9680 | Encrypted storage data
+Log 13: 03 March 2024 00:23:42 | id: 9680 | Closed app
+Log 14: 03 March 2024 00:24:18 | id: 8732 | App opened
+Log 15: 03 March 2024 00:24:20 | id: 8732 | Logged in
+Log 16: 03 March 2024 00:24:20 | id: 8732 | Decrypted storage data
+Log 17: 03 March 2024 00:24:29 | id: 8732 | Logged out
+Log 18: 03 March 2024 00:24:29 | id: 8732 | Encrypted storage data
+Log 19: 03 March 2024 00:24:44 | id: 8732 | Closed app
