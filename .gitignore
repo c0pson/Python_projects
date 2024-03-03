@@ -3,3 +3,5 @@
 /password_manager/build
 /password_manager/dist
 /password_manager/password_manager.spec
+password_manager/storage/storage.txt.enc
+password_manager/storage/logs.txt
