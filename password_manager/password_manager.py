@@ -44,7 +44,7 @@ def logs(info):
     with open(resource_path('storage\\logs.txt'), 'a') as file:
         now = time.time()
         date = datetime.fromtimestamp(now)
-        log_message = f'Log {length}: {date.strftime('%d %B %Y %H:%M:%S')} | {info}\n'
+        log_message = f'Log {length}: {date.strftime('%d %B %Y %H:%M:%S')} | id: {os.getpid()} | {info}\n'
         file.write(log_message)
 
 def load_keys():
@@ -61,7 +61,7 @@ def generate_key():
     return key
 
 def confirm_password(label, app_frame, my_font, my_font_2, login_success, app):
-    logs(f'Set up new password | id: {os.getpid()}')
+    logs('Set up new password')
     password = label.get()
     with open(resource_path('storage\\marker.marker'), 'w') as file:
         file.write(f'{password}')
@@ -152,11 +152,11 @@ def login_proc(app_frame, password_box, was_first_time, login_success, my_font, 
     stored_hashed_password, stored_salt = hash_password(password_str)
 
     if verify_password(password_box.get(), stored_hashed_password, stored_salt):
-        logs(f'Logged in | id: {os.getpid()}')
+        logs('Logged in')
         destroy_old_page(app_frame)
         after_login(app_frame, was_first_time, login_success, app)
     else:
-        logs(f'Wrong password was entered: {password_box.get()} | id: {os.getpid()}')
+        logs(f'Wrong password was entered: {password_box.get()}')
         display_error(app_frame, my_font, 'Wrong Password')
 
 def login_page(app_frame, my_font, my_font_2, was_first_time, login_success, app):
@@ -198,13 +198,13 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         label.configure(state='disabled')
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
-            logs(f'Edited named in {current_label[0]} | id: {os.getpid()}')
+            logs(f'Edited named in {current_label[0]}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
         if text.cget('text') == 'Link:':
-            logs(f'Edited link in {current_label[0]} | id: {os.getpid()}')
+            logs(f'Edited link in {current_label[0]}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
         if text.cget('text') == 'Pass:':
-            logs(f'Edited password in {current_label[0]} | id: {os.getpid()}')
+            logs(f'Edited password in {current_label[0]}')
             save_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
 
 def encrypt_file(file_path, cipher):
@@ -215,7 +215,7 @@ def encrypt_file(file_path, cipher):
         encrypted_file.write(encrypted_data)
     with open(file_path, 'w+') as file:
         file.truncate(0)
-    logs(f'Encrypted data | id: {os.getpid()}')
+    logs('Encrypted storage data')
 
 def decrypt_pass(file_path, cipher):
     with open(file_path, 'rb') as encrypted_file:
@@ -229,7 +229,7 @@ def decrypt_file(file_path, cipher):
     decrypted_data = cipher.decrypt(encrypted_data)
     with open(file_path, 'wb') as decrypted_file:
         decrypted_file.write(decrypted_data)
-    logs(f'Decrypted storage | id: {os.getpid()}')
+    logs('Decrypted storage data')
 
 def copy_label(label):
     pyperclip.copy(str(label.get()))
@@ -292,7 +292,7 @@ def url_label_con(content_frame, my_font_x21, info, current_label, button_index_
 
 def open_in_browser(link):
     call(['C:\\Program Files\\Mozilla Firefox\\Firefox.exe', '-new-tab', link])
-    logs(f'Opened link {link} | id: {os.getpid()}')
+    logs(f'Opened link {link}')
 
 def strength_set(password, label, bar):
     password_strength = 0
@@ -501,7 +501,7 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
     button_index_2.append(label_name)
     if to_append_file:
         label_name_entry.delete('0', 'end')
-        logs(f'Added new password {label_name} | id: {os.getpid()}')
+        logs(f'Added new password {label_name}')
         append_file(button_index_2[-1])
         destroy_old_page(password_index_frame)
         button_index = []
@@ -510,7 +510,7 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
         button_index[-1].invoke()
 
 def remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search, label_name_entry, app):
-    logs(f'Removed password {current_label[0]} | id: {os.getpid()}')
+    logs(f'Removed password {current_label[0]}')
     line_num = int(button_index_2.index(current_label[0])*4+1)
     if current_label[0] != '':
         destroy_old_page(content_frame)
@@ -606,6 +606,7 @@ def print_help(content_frame, my_font):
     label.pack(side='top', padx=10, pady=10, fill='both', expand=True)
 
 def logout(app_frame, my_font, my_font_2, was_first_time, login_success, app):
+    logs('Logged out')
     encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
     login_success[0] = 0
     destroy_old_page(app_frame)
@@ -701,7 +702,7 @@ def after_login(app_frame, was_first_time, login_success, app):
     login_success[0] = 1
 
 def main():
-    logs(f'App opened | id: {os.getpid()}')
+    logs('App opened')
     login_success = [0]
     check_req()
     app = ctk.CTk()
@@ -722,7 +723,7 @@ def main():
     app.mainloop()
     if login_success[0] == 1:
         encrypt_file(resource_path('storage\\storage.txt'), Fernet(load_keys().encode()))
-    logs(f'Closed app | id: {os.getpid()}')
+    logs('Closed app')
 
 if __name__ == "__main__":
     main()
