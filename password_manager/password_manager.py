@@ -456,14 +456,19 @@ def edit_tags_info(current_label, data_to_append, content_frame, my_font_x21, in
             if i == line_to_replace:
                 to_save = line.strip('\n')
                 break
+    check = to_save
+    if 'Favorites, ' in check:
+        check.replace('Favorites, ', '')
+    items = [item.strip() for item in check.split(',') if item.strip()]
+    if data_to_append in to_save or len(items) > 4:
+        return
     to_save = str(to_save) + data_to_append
-    print(data_to_append)
     if line_to_replace is not None and data_to_append != ', ' and data_to_append != ',':
         destroy_old_page(frame)
         save_info_in_file(line_to_replace+1, to_save)
         load_info(content_frame, my_font_x21, current_label, button_index_2)
 
-def change_star(frame, content_frame, my_font_x21, current_label, button_index_2):
+def change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info):
     line_to_replace = None
     with open(resource_path('storage\\storage.txt'), 'r') as file:
         for i, line in enumerate(file):
@@ -485,7 +490,7 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     tags = []
     my_font = ctk.CTkFont('Hack Nerd Font Propo', 37)
     my_font_2 = ctk.CTkFont('Hack Nerd Font Propo', 21)
-    tags_list = info.split(', ')
+    tags_list = info.strip('\n').split(', ')
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
     frame.pack(side='top', padx=10, pady=0, fill='both', expand=True)
     text = ctk.CTkLabel(master=frame, text='Tag:', font=my_font_x21, text_color=Colors.GRAPHITE)
@@ -494,15 +499,15 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     star_button.pack(side='right', padx=10, pady=10)
     label = ctk.CTkLabel(master=star_button, text='⭐', font=my_font, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, anchor='n')
     label.pack(side='right', padx=4, pady=4)
-    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2))
+    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info))
     if 'Favorites' not in info:
         label.bind('<Enter>', lambda event: label.configure(text_color=Colors.INTENS_YELLOW))
         label.bind('<Leave>', lambda event: label.configure(text_color=Colors.GRAPHITE))
     for i in range(len(tags_list)):
-        if tags_list[i] != 'Favorites' and tags_list[i] != '':
-            current_tag = ctk.CTkButton(master=frame, fg_color=Colors.PINK, text=tags_list[i].strip(','), hover=False, font=my_font_x21,
+        if tags_list[i] != 'Favorites' and tags_list[i] != '' and tags_list[i] != 'Favorites,':
+            current_tag = ctk.CTkButton(master=frame, fg_color=Colors.PINK, text=tags_list[i].strip(',').strip(', ').strip(', \n').strip('\n'), hover=False, font=my_font_x21,
                                         text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, height=48)
-            current_tag.pack(side='left', pady=10, padx=5)
+            current_tag.pack(side='left', pady=10, padx=10)
             tags.append(current_tag)
         else:
             label.configure(text_color=Colors.INTENS_YELLOW)
@@ -510,7 +515,7 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     entry.pack(side='right', padx=10, pady=10, expand=True, fill='x')
     add_button = ctk.CTkButton(master=frame, border_color=Colors.GRAPHITE, border_width=3, text='✚', bg_color=Colors.BLUE_BACKGROUND, width=58,
                                 hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE, height=50, font=('Hack Nerd Font Propo', 34), fg_color=Colors.PINK,
-                                command=lambda: edit_tags_info(current_label, str(f', {entry.get()}'), content_frame, my_font_x21, info, frame, button_index_2))
+                                command=lambda: edit_tags_info(current_label, str(f'{entry.get()}, '), content_frame, my_font_x21, info, frame, button_index_2))
     add_button.pack(side='right', padx=0, pady=10)
 
 def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame):
@@ -740,15 +745,12 @@ def load_containers(scroll_frame, label_name_entry, my_font, button_index_2, pas
     with open(resource_path('storage\\storage.txt'), 'r') as file:
         for i, line in enumerate(file):
             if i % 5 == 4 and line != '\n':
-                if ', ' in line:
-                    items = line.split(', ')
-                    for item in items:
-                        list_of_containers.append(item.strip(','))
-                else:
-                    list_of_containers.append(line.strip(', \n'))
+                items = line.split(', ')
+                for item in items:
+                    list_of_containers.append(item.strip(', ').strip('\n'))
     list_of_containers = home + list(set(list_of_containers))
     to_cut_out = list_of_containers[1:]
-    to_cut_out = [item for item in to_cut_out if item != 'Favorites']
+    to_cut_out = [item for item in to_cut_out if item != 'Favorites' and item != '']
     list_of_containers = home + to_cut_out
     for i in range(0, len(list_of_containers), 3):
         sliced_list = list_of_containers[i:i+3]
