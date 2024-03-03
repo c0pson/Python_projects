@@ -199,13 +199,13 @@ def edit_label(label, edit_button, current_label, button_index_2 , text):
         edit_button.configure(text='Edit')
         if text.cget('text') == 'Name:':
             logs(f'Edited named in {current_label[0]}')
-            save_info_in_file(int(button_index_2.index(current_label[0])*4+2), label.get())
+            save_info_in_file(int(button_index_2.index(current_label[0])*5+2), label.get())
         if text.cget('text') == 'Link:':
             logs(f'Edited link in {current_label[0]}')
-            save_info_in_file(int(button_index_2.index(current_label[0])*4+3), label.get())
+            save_info_in_file(int(button_index_2.index(current_label[0])*5+3), label.get())
         if text.cget('text') == 'Pass:':
             logs(f'Edited password in {current_label[0]}')
-            save_info_in_file(int(button_index_2.index(current_label[0])*4+4), label.get())
+            save_info_in_file(int(button_index_2.index(current_label[0])*5+4), label.get())
 
 def encrypt_file(file_path, cipher):
     with open(file_path, 'rb') as file:
@@ -246,7 +246,7 @@ def get_label_info(name) -> list[str] | None:
                     return next_lines
             if name in line:
                 found = True
-            if index % 4 == 0:
+            if index % 5 == 0:
                 found = False
                 next_lines = []
 
@@ -450,14 +450,14 @@ def load_labels_from_file(button_index_2, label_name_entry, password_index_frame
     with open(path,'r') as file:
         lines = file.readlines()
         for i, line in enumerate(lines):
-            if i % 4 == 0:
+            if i % 5 == 0:
                 add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0)
     current_label[0] = ''
 
 def append_file(data):
     path = resource_path('storage\\storage.txt')
     with open(path, 'a') as file:
-        file.write(f'{data}{'\n'*4}')
+        file.write(f'{data}{'\n'*5}')
 
 def remove_from_file(line_numbers):
     path = resource_path('storage\\storage.txt')
@@ -612,12 +612,67 @@ def logout(app_frame, my_font, my_font_2, was_first_time, login_success, app):
     destroy_old_page(app_frame)
     login_page(app_frame, my_font, my_font_2, was_first_time, login_success, app)
 
+def show_category(category, button_index_2, password_index_frame, my_font_x21, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame):
+    destroy_old_page(password_index_frame)
+    button_index = []
+    button_index_2 = []
+    if current_category[0] != '':
+        containers[int(containers_2.index(current_category[0]))].configure(fg_color=Colors.PINK)
+    containers[int(containers_2.index(category.cget('text')))].configure(fg_color=Colors.DARK_PINK)
+    current_category[0] = category.cget('text')
+    if category.cget('text') == 'Home':
+        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
+        return
+    save = None
+    what_to_add = []
+    with open(resource_path('storage\\storage.txt'), 'r') as file:
+        for i, item in enumerate(file):
+            if i % 5 == 0:
+                save = item.strip('\n')
+            if i % 5 == 4  and category.cget('text') == item.strip('\n'):
+                what_to_add.append(save)
+    for item in what_to_add:
+        add_from_search(password_index_frame, item.strip(), my_font_x21, button_index, button_index_2, content_frame, current_label)
+        current_label[0] = ''
+
+def add_container(frame, label_name_entry, my_font, container_name, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2):
+    container_info = ctk.CTkButton(master=frame, border_width=3, border_color=Colors.GRAPHITE, corner_radius=5, hover_color=Colors.DARK_PINK,
+                                fg_color=Colors.PINK, height=48, text=container_name, font=my_font, text_color=Colors.GRAPHITE,
+                                command=lambda: show_category(container_info, button_index_2, password_index_frame, my_font, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame))
+    container_info.pack(side='top', padx=4, pady=8)
+    if container_info.cget('text') == 'Home':
+        container_info.configure(fg_color=Colors.DARK_PINK)
+    containers.append(container_info)
+    containers_2.append(container_name)
+
+def create_new_frame(frame, label_name_entry, my_font, list_of_buttons, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2):
+    new_frame = ctk.CTkFrame(master=frame, fg_color=Colors.BLUE_BACKGROUND)
+    new_frame.pack(side='left', padx=4, pady=0)
+    for item in list_of_buttons:
+        add_container(new_frame, label_name_entry, my_font, item.strip('\n'), containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2)
+
+def load_containers(scroll_frame, label_name_entry, my_font, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category):
+    list_of_containers = []
+    home = ['Home']
+    containers = []
+    containers_2 = []
+    with open(resource_path('storage\\storage.txt'), 'r') as file:
+        for i, line in enumerate(file):
+            if i % 5 == 4:
+                list_of_containers.append(line.strip('\n'))
+    list_of_containers = home + list(set(list_of_containers))
+    print(list_of_containers)
+    for i in range(0, len(list_of_containers), 3):
+        sliced_list = list_of_containers[i:i+3]
+        create_new_frame(scroll_frame, label_name_entry, my_font, sliced_list, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2)
+
 def after_login(app_frame, was_first_time, login_success, app):
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     my_font_x32 = ctk.CTkFont(family='Hack Nerd Font Propo', size=32)
     button_index = []
     button_index_2 = []
     current_label = ['']  
+    current_category = ['']
 
     main_frame = ctk.CTkFrame(master=app_frame, corner_radius=0, fg_color=Colors.BLUE_BACKGROUND)
     main_frame.pack(side='left', expand=True, fill='both', padx=0, pady=0)
@@ -678,7 +733,7 @@ def after_login(app_frame, was_first_time, login_success, app):
     dashboard_frame.pack(side='top', padx=8, pady=8, fill='x')
 
     dashboard_buttons_frame = ctk.CTkFrame(master=dashboard_frame, fg_color=Colors.YELLOW)
-    dashboard_buttons_frame.pack(side='right', padx=3, pady=3, fill='x')
+    dashboard_buttons_frame.pack(side='right', padx=4, pady=4)
 
     exit_button = ctk.CTkButton(master=dashboard_buttons_frame, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text='Exit', command=lambda: app.destroy(),
                                 font=my_font_x21, text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, height=48)
@@ -687,17 +742,25 @@ def after_login(app_frame, was_first_time, login_success, app):
     logout_button = ctk.CTkButton(master=dashboard_buttons_frame, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text='Logout',
                                 command=lambda: logout(app_frame, my_font_x32, my_font_x21, was_first_time, login_success, app),
                                 font=my_font_x21, text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, height=48)
-    logout_button.pack(side='top', padx=10, pady=10)
+    logout_button.pack(side='top', padx=0, pady=0)
 
     help_button = ctk.CTkButton(master=dashboard_buttons_frame, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text='Help', command=lambda: print_help(content_frame, my_font_x21),
                                 font=my_font_x21, text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, height=48)
     help_button.pack(side='top', padx=10, pady=10)
+
+    vault_boxes_frame = ctk.CTkFrame(master=dashboard_frame, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
+    vault_boxes_frame.pack(side='top', padx=8, pady=8, fill='x')
+
+    scrollable_frame = ctk.CTkScrollableFrame(master=vault_boxes_frame, fg_color=Colors.BLUE_BACKGROUND, scrollbar_button_color=Colors.BLUE_BACKGROUND,
+                                            scrollbar_button_hover_color=Colors.BLUE_BACKGROUND, orientation='horizontal')
+    scrollable_frame.pack(padx=3, pady=3, fill='x')
 
     if was_first_time[0] != 1:
         key = load_keys().encode()
         cipher = Fernet(key)
         decrypt_file(resource_path('storage\\storage.txt'), cipher)
     
+    load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category)
     load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame)
     login_success[0] = 1
 
@@ -712,7 +775,7 @@ def main():
     y = app.winfo_screenheight() // 2
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
     my_font_x32 = ctk.CTkFont(family='Hack Nerd Font Propo', size=32)
-    app.geometry(f'1080x720+{x-540}+{y-400}')
+    app.geometry(f'1280x800+{x-640}+{y-440}')
     app.minsize(width=900, height=696)
     app_frame = ctk.CTkFrame(master=app, fg_color=Colors.BLUE_BACKGROUND, corner_radius=0)
     app_frame.pack(expand=True, padx=0, pady=0, fill='both')
