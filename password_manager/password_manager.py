@@ -447,7 +447,7 @@ def generate_password_con(content_frame, my_font_x21):
                                 border_width=3, border_color=Colors.GRAPHITE, text_color=Colors.GRAPHITE)
     generate_button.pack(side='left', padx=0, pady=0, fill='x')
 
-def edit_tags_info(current_label, data_to_append, content_frame, my_font_x21, info, frame, button_index_2, current_tag):
+def edit_tags_info(current_label, data_to_append, content_frame, my_font_x21, info, frame, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers):
     line_to_replace = None
     with open(resource_path('storage\\storage.txt'), 'r') as file:
         for i, line in enumerate(file):
@@ -466,9 +466,9 @@ def edit_tags_info(current_label, data_to_append, content_frame, my_font_x21, in
     if line_to_replace is not None and data_to_append != ', ' and data_to_append != ',':
         destroy_old_page(frame)
         save_info_in_file(line_to_replace+1, to_save)
-        load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag)
+        load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
 
-def change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag):
+def change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers):
     line_to_replace = None
     with open(resource_path('storage\\storage.txt'), 'r') as file:
         for i, line in enumerate(file):
@@ -484,7 +484,7 @@ def change_star(frame, content_frame, my_font_x21, current_label, button_index_2
     if line_to_replace is not None:
         destroy_old_page(frame)
         save_info_in_file(line_to_replace+1, to_save)
-        load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag)
+        load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
 
 def choose_tag(current_tag, tags, tags_2, tag):
     if current_tag[0] != '':
@@ -492,7 +492,7 @@ def choose_tag(current_tag, tags, tags_2, tag):
     tags[int(tags_2.index(tag.cget('text')))].configure(fg_color=Colors.DARK_PINK)
     current_tag[0] = tag.cget('text')
 
-def add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x21, button_index_2, current_label, text):
+def add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x21, text):
     tag = ctk.CTkButton(master=frame_for_tags, fg_color=Colors.PINK, text=text.strip(',').strip(', ').strip(', \n').strip('\n'), hover=False, font=my_font_x21,
                         text_color=Colors.GRAPHITE, border_color=Colors.GRAPHITE, border_width=3, height=48,
                         command=lambda: choose_tag(current_tag, tags, tags_2, tag))
@@ -500,7 +500,7 @@ def add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x
     tags.append(tag)
     tags_2.append(tag.cget('text'))
 
-def remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2):
+def remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers):
     line_to_append = None
     with open(resource_path('storage\\storage.txt'), 'r') as file:
         for i, item in enumerate(file):
@@ -509,58 +509,59 @@ def remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_
             if line_to_append == i:
                 tag_to_edit = item.strip('\n')
     if line_to_append is not None and tag_to_edit != '':
-        print(tag_to_edit)
         tag_to_edit = tag_to_edit.replace(current_tag[0] + ', ', '').strip('\n')
-        print(tag_to_edit)
         save_info_in_file(line_to_append+1, tag_to_edit)
         tags.remove(tags[int(tags_2.index(current_tag[0]))])
         tags_2.remove(current_tag[0])
-    load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag)
+        destroy_old_page(scrollable_frame)
+    load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
 
-def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_2, current_tag):
+def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers):
     tags = []
     tags_2 = []
     my_font = ctk.CTkFont('Hack Nerd Font Propo', 37)
     my_font_2 = ctk.CTkFont('Hack Nerd Font Propo', 21)
     tags_list = info.strip('\n').split(', ')
     frame = ctk.CTkFrame(master=content_frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, border_color=Colors.GRAPHITE, border_width=3)
-    frame.pack(side='top', padx=10, pady=0, fill='both', expand=True)
+    frame.pack(side='top', padx=10, pady=0, fill='both')
     text = ctk.CTkLabel(master=frame, text='Tag:', font=my_font_x21, text_color=Colors.GRAPHITE)
     text.pack(side='left', padx=10, pady=10)
     star_button = ctk.CTkFrame(master=frame, fg_color=Colors.PINK, border_color=Colors.GRAPHITE, border_width=3, corner_radius=5, height=44, width=44)
     star_button.pack(side='right', padx=10, pady=10)
     label = ctk.CTkLabel(master=star_button, text='⭐', font=my_font, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, anchor='n')
     label.pack(side='right', padx=4, pady=4)
-    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag))
+    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers))
     entry = ctk.CTkEntry(master=frame, font=my_font_2, text_color=Colors.GRAPHITE, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=3, height=48)
-    entry.pack(side='right', padx=10, pady=10, expand=True, fill='x')
+    entry.pack(side='right', padx=10, pady=10, fill='x')
     add_button = ctk.CTkButton(master=frame, border_color=Colors.GRAPHITE, border_width=3, text='+', bg_color=Colors.BLUE_BACKGROUND, width=58,
                                 hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE, height=50, font=('Hack Nerd Font Propo', 34, 'bold'), fg_color=Colors.PINK,
-                                command=lambda: edit_tags_info(current_label, str(f'{entry.get()}, '), content_frame, my_font_x21, info, frame, button_index_2, current_tag))
+                                command=lambda: edit_tags_info(current_label, str(f'{entry.get()}, '), content_frame, my_font_x21, info, frame, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers))
     add_button.pack(side='right', padx=0, pady=10)
     remove_button = ctk.CTkButton(master=frame, border_color=Colors.GRAPHITE, border_width=3, text='-', bg_color=Colors.BLUE_BACKGROUND, width=58,
                                 hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE, height=50, font=('Hack Nerd Font Propo', 34, 'bold'), fg_color=Colors.PINK,
-                                command=lambda: remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2))
+                                command=lambda: remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers))
     remove_button.pack(side='right', padx=0, pady=10)
-    frame_for_tags = ctk.CTkFrame(master=frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND)
-    frame_for_tags.pack(side='left', padx=4, pady=4, fill='x', expand=True)
+    frame_for_tags = ctk.CTkFrame(master=frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, height=40)
+    frame_for_tags.pack(side='left', padx=4, pady=4, fill='x')
     if 'Favorites' not in info:
         label.bind('<Enter>', lambda event: label.configure(text_color=Colors.INTENS_YELLOW))
         label.bind('<Leave>', lambda event: label.configure(text_color=Colors.GRAPHITE))
     for i in range(len(tags_list)):
         if tags_list[i] != 'Favorites' and tags_list[i] != '' and tags_list[i] != 'Favorites,':
-            add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x21, button_index_2, current_label, tags_list[i])
+            add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x21, tags_list[i])
         else:
             label.configure(text_color=Colors.INTENS_YELLOW)
 
-def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag):
+def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag, scrollable_frame, current_category, searching, list_of_containers):
+    destroy_old_page(scrollable_frame)
     path = resource_path('storage\\storage.txt')
     with open(path,'r') as file:
         lines = file.readlines()
         for i, line in enumerate(lines):
             if i % 5 == 0:
-                add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0, current_tag)
+                add(line.strip('\n'), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 0, current_tag, scrollable_frame, current_category, searching, list_of_containers)
     current_label[0] = ''
+    current_tag[0] = ''
 
 def append_file(data):
     path = resource_path('storage\\storage.txt')
@@ -587,7 +588,7 @@ def space_frame(content_frame):
     label = ctk.CTkFrame(master=content_frame, fg_color=Colors.YELLOW, height=2)
     label.pack(side='top', padx=0, pady=4)
 
-def load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag):
+def load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers):
     for child in content_frame.winfo_children():
         child.destroy()
     info: list[str] | None = get_label_info(current_label[0])
@@ -597,22 +598,24 @@ def load_info(content_frame, my_font_x21, current_label, button_index_2, current
         username_label_con(content_frame, my_font_x21, info[0], current_label, button_index_2)
         password_label_con(content_frame, my_font_x21, info[2], current_label, button_index_2)
         generate_password_con(content_frame, my_font_x21)
-        load_tag_info(content_frame, my_font_x21, info[3], current_label, button_index_2, current_tag)
+        load_tag_info(content_frame, my_font_x21, info[3], current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
         space_frame(content_frame)
+        load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers, scrollable_frame)
     else:
         url_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
         username_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
         password_label_con(content_frame, my_font_x21, '', current_label, button_index_2)
         generate_password_con(content_frame, my_font_x21)
-        load_tag_info(content_frame, my_font_x21, '', current_label, button_index_2, current_tag)
+        load_tag_info(content_frame, my_font_x21, '', current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
         space_frame(content_frame)
+        load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers, scrollable_frame)
 
-def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, to_append_file, current_tag):
+def add(label_name, label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, to_append_file, current_tag, scrollable_frame, current_category, searching, list_of_containers):
     if label_name == '' or label_name in button_index_2:
         return
     new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK, width=50,
                             border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE,
-                            command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag))
+                            command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag, scrollable_frame, label_name_entry, password_index_frame, current_category, searching, list_of_containers))
     new_label.pack(expand=True, fill='both', padx=1, pady=1)
     button_index.append(new_label)
     button_index_2.append(label_name)
@@ -623,10 +626,10 @@ def add(label_name, label_name_entry, button_index_2, password_index_frame, my_f
         destroy_old_page(password_index_frame)
         button_index = []
         button_index_2 = []
-        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag)
+        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag, scrollable_frame, current_category, searching, list_of_containers)
         button_index[-1].invoke()
 
-def remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search, label_name_entry, app, searching, current_tag):
+def remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search, label_name_entry, app, searching, current_tag, scrollable_frame, current_category, list_of_containers):
     logs(f'Removed password {current_label[0]}')
     line_num = int(button_index_2.index(current_label[0])*5+1)
     if current_label[0] != '':
@@ -636,23 +639,23 @@ def remove(current_label, button_index, button_index_2, content_frame, password_
         button_index.pop(int(button_index_2.index(current_label[0])))
         button_index_2.pop(int(button_index_2.index(current_label[0])))
     current_label[0] = ''
-    search_for_label(button_index, button_index_2, password_index_frame, search, my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag)
+    search_for_label(button_index, button_index_2, password_index_frame, search, my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag, scrollable_frame, current_category, list_of_containers)
 
-def button_clicked(label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag):
+def button_clicked(label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag, scrollable_frame, label_name_entry, password_index_frame, current_category, searching, list_of_containers):
     if current_label[0] != '':
         button_index[int(button_index_2.index(current_label[0]))].configure(fg_color=Colors.PINK)
     button_index[int(button_index_2.index(label.cget('text')))].configure(fg_color=Colors.DARK_PINK)
     current_label[0] = label.cget('text')
-    load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag)
+    load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers)
 
 def on_validate(d, i, P, s, S, v, V, W):
     return len(P) <= 14
 
-def add_from_search(password_index_frame, label_name, my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag):
+def add_from_search(password_index_frame, label_name, my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag, scrollable_frame, label_name_entry, current_category, searching, list_of_containers):
     destroy_old_page(content_frame)
     new_label=ctk.CTkButton(master=password_index_frame, text=label_name, font=my_font_x21, corner_radius=5, fg_color=Colors.PINK, width=50,
                             border_color=Colors.GRAPHITE, border_width=2, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE,
-                            command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag))
+                            command=lambda: button_clicked(new_label, current_label, button_index, button_index_2, content_frame, my_font_x21, current_tag, scrollable_frame, label_name_entry, password_index_frame, current_category, searching, list_of_containers))
     new_label.pack(expand=True, fill='both', padx=1, pady=1)
     button_index.append(new_label)
     button_index_2.append(label_name)
@@ -679,7 +682,7 @@ def display_error(app, my_font, my_text):
     message.append(frame_for_error)
     app.after(1500, lambda: frame_for_error.destroy())
 
-def search_for_label(button_index, button_index_2, password_index_frame, search, my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag):
+def search_for_label(button_index, button_index_2, password_index_frame, search, my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag, scrollable_frame, current_category, list_of_containers):
     founded_items = []
     items_to_show = []
     items_to_show_2 = []
@@ -701,7 +704,7 @@ def search_for_label(button_index, button_index_2, password_index_frame, search,
             button_index_2 = []
             current_label[0] = ''
             for item in founded_items:
-                add_from_search(password_index_frame, item, my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag)
+                add_from_search(password_index_frame, item, my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag, scrollable_frame, label_name_entry, current_category, searching, list_of_containers)
             founded_items = []
             items_to_show = []
             items_to_show_2 = []
@@ -713,7 +716,7 @@ def search_for_label(button_index, button_index_2, password_index_frame, search,
         destroy_old_page(password_index_frame)
         button_index = []
         button_index_2 = []
-        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag)
+        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag, scrollable_frame, current_category, searching, list_of_containers)
         password_index_frame.focus()
         searching[0] = 0
 
@@ -732,8 +735,10 @@ def logout(app_frame, my_font, my_font_2, was_first_time, login_success, app):
     destroy_old_page(app_frame)
     login_page(app_frame, my_font, my_font_2, was_first_time, login_success, app)
 
-def show_category(category, button_index_2, password_index_frame, my_font_x21, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame, searching, current_tag):
+def show_category(category, button_index_2, password_index_frame, my_font_x21, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame, searching, current_tag, scrollable_frame, list_of_containers):
     destroy_old_page(content_frame)
+    for item in containers:
+        item.configure(fg_color=Colors.PINK)
     if searching[0] == 1:
         containers[int(containers_2.index(current_category[0]))].configure(fg_color=Colors.PINK)
         return
@@ -745,7 +750,8 @@ def show_category(category, button_index_2, password_index_frame, my_font_x21, b
     containers[int(containers_2.index(category.cget('text')))].configure(fg_color=Colors.DARK_PINK)
     current_category[0] = category.cget('text')
     if category.cget('text') == 'Home':
-        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag)
+        load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag, scrollable_frame, current_category, searching, list_of_containers)
+        load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers, scrollable_frame)
         return
     save = None
     what_to_add = []
@@ -756,24 +762,25 @@ def show_category(category, button_index_2, password_index_frame, my_font_x21, b
             if i % 5 == 4  and category.cget('text') in (item.strip('\n')).split(', '):
                 what_to_add.append(save)
     for item in what_to_add:
-        add_from_search(password_index_frame, item.strip(), my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag)
+        add_from_search(password_index_frame, item.strip(), my_font_x21, button_index, button_index_2, content_frame, current_label, current_tag, scrollable_frame, label_name_entry, current_category, searching, list_of_containers)
         current_label[0] = ''
 
-def add_container(frame, label_name_entry, my_font, container_name, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, current_tag):
+def add_container(frame, label_name_entry, my_font, container_name, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, current_tag, scrollable_frame, list_of_containers):
     container_info = ctk.CTkButton(master=frame, border_width=3, border_color=Colors.GRAPHITE, corner_radius=5, hover_color=Colors.DARK_PINK,
                                 fg_color=Colors.PINK, height=48, text=container_name, font=my_font, text_color=Colors.GRAPHITE,
-                                command=lambda: show_category(container_info, button_index_2, password_index_frame, my_font, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame, searching, current_tag))
+                                command=lambda: show_category(container_info, button_index_2, password_index_frame, my_font, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame, searching, current_tag, scrollable_frame, list_of_containers))
     container_info.pack(side='top', padx=4, pady=8, expand=True)
     containers.append(container_info)
     containers_2.append(container_name)
 
-def create_new_frame(frame, label_name_entry, my_font, list_of_buttons, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching):
+def create_new_frame(frame, label_name_entry, my_font, list_of_buttons, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, scrollable_frame, list_of_containers):
     new_frame = ctk.CTkFrame(master=frame, fg_color=Colors.BLUE_BACKGROUND)
     new_frame.pack(side='left', padx=4, pady=0, expand=True, anchor='nw')
     for item in list_of_buttons:
-        add_container(new_frame, label_name_entry, my_font, item.strip('\n'), containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, current_category)
+        add_container(new_frame, label_name_entry, my_font, item.strip('\n'), containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, current_category, scrollable_frame, list_of_containers)
 
-def load_containers(scroll_frame, label_name_entry, my_font, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers):
+def load_containers(scroll_frame, label_name_entry, my_font, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers, scrollable_frame):
+    destroy_old_page(scrollable_frame)
     home = ['Home', 'Favorites']
     containers = []
     containers_2 = []
@@ -785,11 +792,11 @@ def load_containers(scroll_frame, label_name_entry, my_font, button_index_2, pas
                     list_of_containers.append(item.strip(', ').strip('\n'))
     list_of_containers = home + list(set(list_of_containers))
     to_cut_out = list_of_containers[1:]
-    to_cut_out = [item for item in to_cut_out if item != 'Favorites' and item != '']
+    to_cut_out = [item for item in to_cut_out if item != 'Favorites' and item != '' and item != 'Home']
     list_of_containers = home + to_cut_out
     for i in range(0, len(list_of_containers), 3):
         sliced_list = list_of_containers[i:i+3]
-        create_new_frame(scroll_frame, label_name_entry, my_font, sliced_list, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching)
+        create_new_frame(scroll_frame, label_name_entry, my_font, sliced_list, containers, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, containers_2, searching, scroll_frame ,list_of_containers)
 
 def after_login(app_frame, was_first_time, login_success, app):
     my_font_x21 = ctk.CTkFont(family='Hack Nerd Font Propo', size=21)
@@ -841,7 +848,7 @@ def after_login(app_frame, was_first_time, login_success, app):
     label_name_entry.pack(side='top', fill='x', padx=10, pady=10)
 
     add_button = ctk.CTkButton(master=buttons_index_frame, text='Add', font=my_font_x21, height=38,
-                                command=lambda: add(str(label_name_entry.get()), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 1, current_category),
+                                command=lambda: add(str(label_name_entry.get()), label_name_entry, button_index_2, password_index_frame, my_font_x21, button_index, current_label, content_frame, 1, current_category, scrollable_frame, current_category, searching, list_of_containers),
                                 border_color=Colors.GRAPHITE, border_width=2, fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE)
     add_button.pack(side='top', fill='x', padx=10, pady=0)
 
@@ -851,7 +858,7 @@ def after_login(app_frame, was_first_time, login_success, app):
 
     remove_button = ctk.CTkButton(master=buttons_index_frame, text='Remove',
                                 font=my_font_x21, height=38, border_color=Colors.GRAPHITE, border_width=2,
-                                command=lambda: remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search_label.get(), label_name_entry, app, searching, current_category),
+                                command=lambda: remove(current_label, button_index, button_index_2, content_frame, password_index_frame, my_font_x21, search_label.get(), label_name_entry, app, searching, current_category, scrollable_frame, current_category, list_of_containers),
                                 fg_color=Colors.PINK, hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE)
     remove_button.pack(side='top', fill='x', padx=10, pady=10)
 
@@ -885,12 +892,12 @@ def after_login(app_frame, was_first_time, login_success, app):
         key = load_keys().encode()
         cipher = Fernet(key)
         decrypt_file(resource_path('storage\\storage.txt'), cipher)
-    
-    search_label.bind("<KeyRelease>", command=lambda search: search_for_label(button_index, button_index_2, password_index_frame, search_label.get(), my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag))
 
-    load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers)
-    load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_category)
+    load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_category, scrollable_frame, current_category, searching, list_of_containers)
+    load_containers(scrollable_frame, label_name_entry, my_font_x21, button_index_2, password_index_frame, button_index, current_label, content_frame, current_category, searching, list_of_containers, scrollable_frame)
     login_success[0] = 1
+
+    search_label.bind("<KeyRelease>", command=lambda search: search_for_label(button_index, button_index_2, password_index_frame, search_label.get(), my_font_x21, content_frame, current_label, label_name_entry, app, searching, current_tag,  scrollable_frame, current_category, list_of_containers))
 
 def main():
     logs('App opened')
