@@ -500,6 +500,23 @@ def add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x
     tags.append(tag)
     tags_2.append(tag.cget('text'))
 
+def remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2):
+    line_to_append = None
+    with open(resource_path('storage\\storage.txt'), 'r') as file:
+        for i, item in enumerate(file):
+            if i % 5 == 0 and item.strip('\n') == current_label[0]:
+                line_to_append = i + 4
+            if line_to_append == i:
+                tag_to_edit = item.strip('\n')
+    if line_to_append is not None and tag_to_edit != '':
+        print(tag_to_edit)
+        tag_to_edit = tag_to_edit.replace(current_tag[0] + ', ', '').strip('\n')
+        print(tag_to_edit)
+        save_info_in_file(line_to_append+1, tag_to_edit)
+        tags.remove(tags[int(tags_2.index(current_tag[0]))])
+        tags_2.remove(current_tag[0])
+    load_info(content_frame, my_font_x21, current_label, button_index_2, current_tag)
+
 def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_2, current_tag):
     tags = []
     tags_2 = []
@@ -523,7 +540,7 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     add_button.pack(side='right', padx=0, pady=10)
     remove_button = ctk.CTkButton(master=frame, border_color=Colors.GRAPHITE, border_width=3, text='-', bg_color=Colors.BLUE_BACKGROUND, width=58,
                                 hover_color=Colors.DARK_PINK, text_color=Colors.GRAPHITE, height=50, font=('Hack Nerd Font Propo', 34, 'bold'), fg_color=Colors.PINK,
-                                command=lambda: edit_tags_info(current_label, str(f'{entry.get()}, '), content_frame, my_font_x21, info, frame, button_index_2, current_tag))
+                                command=lambda: remove_tag(current_tag, tags, tags_2, current_label, content_frame, my_font_x21, button_index_2))
     remove_button.pack(side='right', padx=0, pady=10)
     frame_for_tags = ctk.CTkFrame(master=frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND)
     frame_for_tags.pack(side='left', padx=4, pady=4, fill='x', expand=True)
@@ -747,9 +764,6 @@ def add_container(frame, label_name_entry, my_font, container_name, containers, 
                                 fg_color=Colors.PINK, height=48, text=container_name, font=my_font, text_color=Colors.GRAPHITE,
                                 command=lambda: show_category(container_info, button_index_2, password_index_frame, my_font, button_index, current_label, label_name_entry, current_category, containers, containers_2, content_frame, searching, current_tag))
     container_info.pack(side='top', padx=4, pady=8, expand=True)
-    if container_info.cget('text') == 'Home':
-        container_info.configure(fg_color=Colors.DARK_PINK)
-        current_category[0] = 'Home'
     containers.append(container_info)
     containers_2.append(container_name)
 
