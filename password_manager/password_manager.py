@@ -530,7 +530,6 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     star_button.pack(side='right', padx=10, pady=10)
     label = ctk.CTkLabel(master=star_button, text='⭐', font=my_font, fg_color=Colors.PINK, text_color=Colors.GRAPHITE, anchor='n')
     label.pack(side='right', padx=4, pady=4)
-    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers))
     entry = ctk.CTkEntry(master=frame, font=my_font_2, text_color=Colors.GRAPHITE, fg_color=Colors.GREEN, border_color=Colors.GRAPHITE, border_width=3, height=48)
     entry.pack(side='right', padx=10, pady=10, fill='x')
     add_button = ctk.CTkButton(master=frame, border_color=Colors.GRAPHITE, border_width=3, text='+', bg_color=Colors.BLUE_BACKGROUND, width=58,
@@ -543,14 +542,17 @@ def load_tag_info(content_frame, my_font_x21, info, current_label, button_index_
     remove_button.pack(side='right', padx=0, pady=10)
     frame_for_tags = ctk.CTkFrame(master=frame, corner_radius=5, fg_color=Colors.BLUE_BACKGROUND, height=40)
     frame_for_tags.pack(side='left', padx=4, pady=4, fill='x')
-    if 'Favorites' not in info:
-        label.bind('<Enter>', lambda event: label.configure(text_color=Colors.INTENS_YELLOW))
-        label.bind('<Leave>', lambda event: label.configure(text_color=Colors.GRAPHITE))
+    if 'Favorites' not in info and 'Favorites,' not in info:
+        label.bind('<Leave>', lambda e: label.configure(e, text_color=Colors.GRAPHITE))
+        label.bind('<Enter>', lambda e: label.configure(e, text_color=Colors.INTENS_YELLOW))
+    else:
+        label.configure(text_color=Colors.INTENS_YELLOW)
     for i in range(len(tags_list)):
         if tags_list[i] != 'Favorites' and tags_list[i] != '' and tags_list[i] != 'Favorites,':
             add_tags(frame_for_tags, current_tag, tags, tags_2, content_frame, my_font_x21, tags_list[i])
         else:
             label.configure(text_color=Colors.INTENS_YELLOW)
+    label.bind('<Button-1>', lambda event: change_star(frame, content_frame, my_font_x21, current_label, button_index_2, info, current_tag, scrollable_frame, label_name_entry, password_index_frame, button_index, current_category, searching, list_of_containers))
 
 def load_labels_from_file(button_index_2, label_name_entry, password_index_frame, my_font_x21, button_index, current_label, content_frame, current_tag, scrollable_frame, current_category, searching, list_of_containers):
     destroy_old_page(scrollable_frame)
