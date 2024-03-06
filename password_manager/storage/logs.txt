@@ -1,0 +1,21 @@
+Log  1: 06 March 2024 20:32:15 | id: 8320 | App opened
+Log  2: 06 March 2024 20:32:26 | id: 8320 | Set up new password
+Log  3: 06 March 2024 20:32:28 | id: 8320 | Logged in
+Log  4: 06 March 2024 20:32:36 | id: 8320 | Added new password test
+Log  5: 06 March 2024 20:33:04 | id: 8320 | Encrypted storage data
+Log  6: 06 March 2024 20:33:04 | id: 8320 | Closed app
+Log  7: 06 March 2024 20:33:51 | id: 17212 | App opened
+Log  8: 06 March 2024 20:33:58 | id: 17212 | Wrong password was entered: sec
+Log  9: 06 March 2024 20:34:08 | id: 17212 | Logged in
+Log 10: 06 March 2024 20:34:08 | id: 17212 | Decrypted storage data
+Log 11: 06 March 2024 20:34:13 | id: 17212 | Edited password in test
+Log 12: 06 March 2024 20:34:13 | id: 17212 | Edited named in test
+Log 13: 06 March 2024 20:34:13 | id: 17212 | Edited link in test
+Log 14: 06 March 2024 20:34:17 | id: 17212 | Edited password in test
+Log 15: 06 March 2024 20:34:26 | id: 17212 | Edited link in test
+Log 16: 06 March 2024 20:34:27 | id: 17212 | Opened link youtube.com
+Log 17: 06 March 2024 20:34:36 | id: 17212 | Logged out
+Log 18: 06 March 2024 20:34:36 | id: 17212 | Encrypted storage data
+Log 19: 06 March 2024 20:34:41 | id: 17212 | Closed app
+Log 20: 06 March 2024 20:34:52 | id: 8452 | App opened
+Log 21: 06 March 2024 20:35:59 | id: 8452 | Closed app
