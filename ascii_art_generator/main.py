@@ -18,10 +18,22 @@ def image_path(image_name: str) -> str:
     image_path = os.path.join(working_dir, image_name)
     return image_path
 
-def get_details_info() -> int:
-    details_level = int(input('Enter details level from 1 to 100: '))
-    details_level = int(101 - details_level)
+def input_info(ask: str) -> str:
+    details_level = input(f'{ask}: ')
     return details_level
+
+def convert_to_int(user_input: str, ask: str) -> int:
+    while isinstance(user_input, str):
+        try:
+            int(user_input)
+            if 1 <= int(user_input) <= 100:
+                break
+            else:
+                input_info('Enter number in range 1 to 100')
+        except ValueError as e:
+            print(e)
+            input_info(ask)
+    return 101 - int(user_input)
 
 def print_ascii_art(luminance_data: list[int]) -> None:
     characters: list[str] = ['#', '$', '&', '%', '!', '+', '"', '=', '\'', '_', '-', ',', '.']
@@ -34,12 +46,26 @@ def print_ascii_art(luminance_data: list[int]) -> None:
             print(''.join(line_list))
             line_list = []
 
+def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
+    characters: list[str] = ['#', '$', '&', '%', '!', '+', '"', '=', '\'', '_', '-', ',', '.']
+    line_list: list[str] = []
+    with open(path_to_save, 'a') as file:
+        for item in luminance_data:
+            if item != 9999:
+                index = int(item // 13)
+                line_list.append(characters[int(item // 15)] if index < 13 else characters[12])
+            else:
+                file.write(f'{''.join(line_list)}\n')
+                line_list = []
+
 def main() -> None:
-    path = image_path('aigeneratedpotion.png')
-    details = get_details_info()
-    luminance_data: list[int] = get_luminace(path, details)
+    img_path = image_path('zuza.jpg')
+    details = convert_to_int(input_info('Insert number from 1 to 100'), 'Insert number from 1 to 100')
+    luminance_data: list[int] = get_luminace(img_path, details)
     os.system('cls')
-    print_ascii_art(luminance_data)
+    # print_ascii_art(luminance_data)
+    save_path: str = input_info('Enter path where file will be saved')
+    save_to_file(luminance_data, save_path)
 
 if __name__ == "__main__":
     main()
