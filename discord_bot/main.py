@@ -1,6 +1,5 @@
-from discord import Intents, Client, Message
+from discord import Intents, Client
 from responses import get_response
-import os
 
 # SET UP TOKEN
 TOKEN = 'MTIxNTA0MzI2NzY2MjU3Nzc2NQ.GOiCMu.A1m9utctCzmJ76dsG6gWebagIbd6RLHjo9Kd2g'
