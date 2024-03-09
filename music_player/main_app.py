@@ -1,16 +1,25 @@
 import customtkinter as ctk
-import pygame.mixer  # noqa: F401
-import os  # noqa: F401
+from enum import Enum
+import pygame.mixer
+import os
+
+# color palette
+class Color(str, Enum):
+    BACKGROUND_1 = '#222831'
+    BACKGROUND_2 = '#2A2F38'
+    BACKGROUND_3 = '#31363F'
+    TILE_1 = '#547177'
+    TILE_2 = '#76ABAE'
+    TILE_3 = '#B2CDCE'
+    TEXT = '#EEEEEE'
 
 # handlig files
-
 def resource_path(file_name: str) -> str:
     dirname = os.path.dirname(__file__)
     storage = os.path.join(dirname, 'storage') # now its just for testing
     return os.path.join(storage, file_name)
 
-# handling music gotta be hard
-
+# handling music
 def load_music(file_name: str) -> None:
     pygame.mixer.music.load(file_name)
 
@@ -28,12 +37,6 @@ def play_pause_music(play_button, currently_playing):
         pygame.mixer.music.pause()
         play_button.configure(text='PLAY')
 
-def pause_music():
-    ...
-
-def resume_music():
-    ...
-
 def abort_music():
     ...
 
@@ -50,6 +53,7 @@ def player_menu(app):
 def app_frame():
     width, height = 1080, 720
     app = ctk.CTk()
+    app.configure(fg_color='#222831')
     app.title('Music Player')
     app.geometry(f'{width}x{height}')
 
