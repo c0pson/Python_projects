@@ -5,7 +5,7 @@ def get_luminace(image_path: str, details: int) -> list[int]:
     image = Image.open(image_path)
     width, height = image.size
     image_lum_data = []
-    for y in range(0, height, 2 * details):
+    for y in range(0, height, details):
         for x in range(0, width, details):
             r, g, b = image.getpixel((x, y))
             luminance = 0.299 * r + 0.587 * g + 0.114 * b
@@ -19,17 +19,24 @@ def image_path(image_name: str) -> str:
     return image_path
 
 def input_info(ask: str) -> str:
-    details_level = input(f'{ask}: ')
-    return details_level
+    user_input = input(f'{ask}: ')
+    return user_input
+
+def show_path(user_input: str) -> None:
+    if not os.path.isabs(user_input):
+        dirname = os.path.dirname(__file__)
+        print(f'Your file is saved in: {dirname}\\{user_input}')
+    else:
+        print(f'Your file is saved in: {user_input}')
 
 def convert_to_int(user_input: str, ask: str) -> int:
     while isinstance(user_input, str):
         try:
             int(user_input)
-            if 1 <= int(user_input) <= 100:
+            if 1 <= int(user_input) and int(user_input) <= 100:
                 break
             else:
-                input_info('Enter number in range 1 to 100')
+                input_info(ask)
         except ValueError as e:
             print(e)
             input_info(ask)
@@ -47,7 +54,7 @@ def print_ascii_art(luminance_data: list[int]) -> None:
             line_list = []
 
 def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
-    characters: list[str] = ['#', '$', '&', '%', '!', '+', '"', '=', '\'', '_', '-', ',', '.']
+    characters: list[str] = ['#', '$', '&', '%', '!', '+', '"', '=', '\'', '_', '-', '.', ' ']
     line_list: list[str] = []
     with open(path_to_save, 'a') as file:
         for item in luminance_data:
@@ -57,9 +64,10 @@ def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
             else:
                 file.write(f'{''.join(line_list)}\n')
                 line_list = []
+    show_path(path_to_save)
 
 def main() -> None:
-    img_path = image_path('zuza.jpg')
+    img_path = image_path('aigeneratedpotion2.png')
     details = convert_to_int(input_info('Insert number from 1 to 100'), 'Insert number from 1 to 100')
     luminance_data: list[int] = get_luminace(img_path, details)
     os.system('cls')
