@@ -84,7 +84,7 @@ def update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, upda
         app.after(100, lambda: lenght_bar.set(1))
         value = -1
         if shuffle[0] == 1:
-            if files_list.index(''.join(file_name))+1 <= len(files_list):
+            if files_list.index(''.join(file_name)) < len(files_list) - 1:
                 next_song = files_list[(files_list.index(''.join(file_name)))+1]
                 app.after(140, lambda: start_new_song(app, next_song, play_button, currently_playing, lenght, lenght_bar, shuffle, files_list))
 
@@ -130,7 +130,7 @@ def create_button(app, frame, info, play_button, currently_playing, lenght, leng
     button.pack()
 
 def songs_list(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle):
-    scroll_frame = ctk.CTkFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_3)
+    scroll_frame = ctk.CTkScrollableFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_3)
     scroll_frame.pack(side='top', fill='both', expand=True)
     files_list = get_files_in_folder()
     for item in files_list:
