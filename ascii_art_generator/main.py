@@ -5,7 +5,7 @@ def get_luminace(image_path: str, details: int) -> list[int]:
     image = Image.open(image_path)
     width, height = image.size
     image_lum_data = []
-    for y in range(0, height, details):
+    for y in range(0, height, 2*details):
         for x in range(0, width, details):
             r, g, b = image.getpixel((x, y))
             luminance = 0.299 * r + 0.587 * g + 0.114 * b
@@ -67,7 +67,7 @@ def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
     show_path(path_to_save)
 
 def main() -> None:
-    img_path = image_path('aigeneratedpotion2.png')
+    img_path = image_path('3113740-4046895436.jpg')
     details = convert_to_int(input_info('Insert number from 1 to 100'), 'Insert number from 1 to 100')
     luminance_data: list[int] = get_luminace(img_path, details)
     os.system('cls')
