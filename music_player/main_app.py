@@ -2,7 +2,6 @@ import customtkinter as ctk
 from PIL import Image  # noqa: F401
 from enum import Enum
 import pygame.mixer
-import tkinter
 import os
 
 # color palette
@@ -33,37 +32,29 @@ def destroy_old_page(page):
 # handlig files
 def resource_path(file_name: str) -> str:
     dirname = os.path.dirname(__file__)
-    return os.path.join(dirname, file_name)
+    return os.path.join(dirname, ''.join(file_name))
 
-def get_files_in_folder(album_name):
-    print(album_name)
+def get_files_in_folder():
     files_list = []
-    for root, dirs, files in os.walk(os.path.join('storage', album_name)):
+    for root, dirs, files in os.walk(os.path.join('storage')):
         for file in files:
-            files_list.append(os.path.join('storage', album_name, file))
+            files_list.append(os.path.join('storage', file))
     return files_list
-
-def get_folders_from_storage() -> list[str]:
-    folders = []
-    for item in os.listdir('storage'):
-        if os.path.isdir(os.path.join('storage', item)):
-            folders.append(item)
-    return folders
 
 # handling music
 def load_music(file_name: str) -> None:
-    pygame.mixer.music.load(file_name)
+    pygame.mixer.music.load(''.join(file_name))
 
-def play_pause_music(app, play_button, currently_playing, lenght, lenght_bar, file_name) -> None:
+def play_pause_music(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle, files_list) -> None:
     if file_name[0] != '':
         if play_button.cget('text') == ascii_symbols.PLAY and currently_playing[0] == 0:
             lenght_bar.configure(progress_color=Color.TEXT)
-            get_lenght(lenght, file_name[0])
-            load_music(resource_path(file_name[0]))
+            get_lenght(lenght, file_name)
+            load_music(resource_path(file_name))
             pygame.mixer.music.play()
             play_button.configure(text=ascii_symbols.PAUSE)
             currently_playing[0] = 1
-            update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, True)
+            update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, True, shuffle, files_list, file_name)
         elif play_button.cget('text') == ascii_symbols.PLAY and currently_playing[0] == 1:
             pygame.mixer.music.unpause()
             play_button.configure(text=ascii_symbols.PAUSE)
@@ -79,25 +70,31 @@ def get_lenght(lenght, file_name) -> None:
 
 # GUI
 # player informations
-def update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, update: bool):
+def update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, update: bool, shuffle, files_list, file_name):
     if lenght[0] != 0:
         value = ((pygame.mixer.music.get_pos() / 360000) - lenght[0]) / (lenght[0]*1000)
         lenght_bar.set(value)
     if update and currently_playing[0] == 1:
-        app.after(100, lambda e: update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, True), lenght_bar)
+        app.after(100, lambda e, a: update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, True, shuffle, files_list, file_name), lenght_bar, shuffle)
     if currently_playing[0] == 1 and abs(value-1) < 0.03:
         play_button.configure(text=ascii_symbols.PLAY)
         currently_playing[0] = 0
         pygame.mixer.music.unload()
-        app.after(100, lambda e: update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, False), lenght_bar)
+        app.after(100, lambda e, a: update_len_bar(app, lenght_bar, lenght, play_button, currently_playing, False, shuffle, files_list, file_name), lenght_bar, shuffle)
         app.after(100, lambda: lenght_bar.set(1))
         value = -1
+        if shuffle[0] == 1:
+            if files_list.index(''.join(file_name))+1 <= len(files_list):
+                next_song = files_list[(files_list.index(''.join(file_name)))+1]
+                app.after(140, lambda: start_new_song(app, next_song, play_button, currently_playing, lenght, lenght_bar, shuffle, files_list))
 
-def player_menu(app, font_x21, file_name, album_name):
+def player_menu(app, font_x21):
     menu_frame = ctk.CTkFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_2)
     menu_frame.pack(side='bottom', fill='x')
     currently_playing = [0]
     lenght = [0]
+    file_name = ['']
+    shuffle = [1]
 
     lenght_bar = ctk.CTkProgressBar(master=app, fg_color=Color.TILE_2, progress_color=Color.TILE_2,
                                     determinate_speed=0.2, indeterminate_speed=0.2, bg_color=Color.TILE_2)
@@ -105,7 +102,7 @@ def player_menu(app, font_x21, file_name, album_name):
     lenght_bar.set(0)
 
     play_button = ctk.CTkButton(master=menu_frame, text=ascii_symbols.PLAY, font=font_x21,
-                                command=lambda: play_pause_music(app, play_button, currently_playing, lenght, lenght_bar, file_name),
+                                command=lambda: play_pause_music(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle, []),
                                 fg_color=Color.TILE_2, hover_color=Color.TILE_1, text_color=Color.TEXT, width=10)
     play_button.pack(side='left', anchor='center', padx=10, pady=10)
 
@@ -114,68 +111,42 @@ def player_menu(app, font_x21, file_name, album_name):
     volume_bar.set(1)
     volume_bar.pack(side='right', padx=10, pady=10)
 
-    album_list(app, font_x21, file_name, album_name, play_button, currently_playing, lenght, lenght_bar)
+    songs_list(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle)
 
-# albums view
-def show_album(app, radio_var, albums_list, font_x21, file_name, album_name, play_button, currently_playing, lenght, lenght_bar):
-    album_name[0] = albums_list[radio_var.get()]
-    songs_list(app, radio_var, albums_list, font_x21, file_name, album_name, currently_playing, play_button)
+def start_new_song(app, file_name, play_button, currently_playing, lenght, lenght_bar, shuffle, files_list):
+    pygame.mixer.music.unload()
+    play_button.configure(text=ascii_symbols.PLAY)
+    currently_playing[0] = 0
+    load_music(''.join(file_name))
+    play_pause_music(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle, files_list)
 
-def album_list(app, font_x21, file_name, album_name, play_button, currently_playing, lenght, lenght_bar):
-    scrollable_frame = ctk.CTkScrollableFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_3)
-    scrollable_frame.pack(side='left', fill='both')
-    albums_list = get_folders_from_storage()
-    radio_var = tkinter.IntVar(value=0)
-    for i, item in enumerate(albums_list):
-        button = ctk.CTkRadioButton(master=scrollable_frame, text=f'{item} ', font=font_x21, variable= radio_var,
-                                    value=i, border_width_checked=0, border_width_unchecked=0,
-                                    command=lambda: show_album(app, radio_var, albums_list, font_x21, file_name, album_name, play_button, currently_playing, lenght, lenght_bar))
-        image = Image.open('storage\\test.jpg')
-        image_d = ctk.CTkImage(dark_image=image, size=(40,40))
-        label = ctk.CTkLabel(master=button, image=image_d, fg_color=Color.BACKGROUND_3, text='')
-        label.grid(row=0, column=0, sticky='w')
-        button.pack(side='top', pady=8, padx=5, fill='x')
+def click_button(app, play_button, currently_playing, lenght, lenght_bar, button, file_name, shuffle, files_list):
+    file_name[0] = ('storage\\' + button.cget('text') + '.mp3')
+    start_new_song(app, file_name, play_button, currently_playing, lenght, lenght_bar, shuffle, files_list)
 
-# songs view
-def choose_song(file_name, radio_var_2, files_in_album, currently_playing, play_button):
-    if currently_playing[0] == 0:
-        file_name[0] = files_in_album[radio_var_2.get()]
-        currently_playing[0] = 1
-    else:
-        currently_playing[0] = 0
-        pygame.mixer.music.unload()
-        play_button.configure(text=ascii_symbols.PLAY)
+def create_button(app, frame, info, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle, files_list):
+    button = ctk.CTkButton(master=frame, text=os.path.basename(info).strip('.mp3'),
+                            command=lambda: click_button(app, play_button, currently_playing, lenght, lenght_bar, button, file_name, shuffle, files_list))
+    button.pack()
 
-def songs_list(app, radio_var, albums_list, font_x21, file_name, album_name, currently_playing, play_button):
-    destroy_old_page(app)
-    print(album_name[0])
-    player_menu(app, font_x21, file_name, album_name)
-    scrollable_frame = ctk.CTkScrollableFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_1)
-    scrollable_frame.pack(side='top', anchor='center', expand=True, fill='both')
-    if albums_list[0] != '':
-        print(albums_list[radio_var.get()])
-        radio_var_2 = tkinter.IntVar(value=0)
-        files_in_album = get_files_in_folder((albums_list[radio_var.get()]))
-        for i, item in enumerate(files_in_album):
-            button = ctk.CTkRadioButton(master=scrollable_frame, text=f'{os.path.basename(item)}'.strip('.mp3'), font=font_x21, variable=radio_var_2,
-                                        value=i, border_width_checked=0, border_width_unchecked=0,
-                                        command=lambda: choose_song(file_name, radio_var_2, files_in_album, currently_playing, play_button))
-            button.pack(side='top', pady=8, padx=5, fill='x')
+def songs_list(app, play_button, currently_playing, lenght, lenght_bar, file_name, shuffle):
+    scroll_frame = ctk.CTkFrame(master=app, corner_radius=0, fg_color=Color.BACKGROUND_3)
+    scroll_frame.pack(side='top', fill='both', expand=True)
+    files_list = get_files_in_folder()
+    for item in files_list:
+        create_button(app, scroll_frame, item.strip(), play_button, currently_playing, lenght, lenght_bar, file_name, shuffle, files_list)
 
-def app_frame():
+def app_frame() -> None:
     width, height = 1080, 720
     app = ctk.CTk()
     app.configure(fg_color=Color.BACKGROUND_1)
     app.title('Music Player')
     app.geometry(f'{width}x{height}')
     font_x21 = ctk.CTkFont(family='Hack Nerd Font', size=21)
-    album_name = ['']
-    file_name = ['']
 
-    player_menu(app, font_x21, file_name, album_name)
+    player_menu(app, font_x21)
 
     app.mainloop()
-
 
 def main() -> None:
     pygame.mixer.init()
