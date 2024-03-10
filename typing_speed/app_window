@@ -1,0 +1,59 @@
+from pynput import keyboard
+import os
+
+class Color:
+    PURPLE = '\033[95m'
+    BLUE = '\033[94m'
+    GREEN = '\033[92m'
+    YELLOW = '\033[93m'
+    RED = '\033[91m'
+    END = '\033[0m'
+
+def get_terminal_size():
+    columns, rows = os.get_terminal_size()
+    os.system('cls')
+    print(f'Columns: {columns} | Rows: {rows}')
+
+def end_points(points):
+    print(points)
+
+def terminal_GUI(text: str):
+    print(f'\n\t{text}')
+
+def check_if_correct(keys_history, key, text, points):
+    if len(keys_history) == len(text):
+        end_points(points)
+        exit()
+    elif key == 'backspace':
+        keys_history.pop()
+    elif text[len(keys_history)].lower() == ' ' and key == 'space':
+        keys_history.append(key)
+        points.append(1)
+    elif text[len(keys_history)].lower() == key:
+        keys_history.append(key)
+        points.append(1)
+    else:
+        keys_history.append(key)
+        points.append(0)
+
+def key_pressed(key, keys_history, text, points):
+    if key == keyboard.Key.esc:
+        exit()
+    try:
+        k = key.char
+    except AttributeError:
+        k = key.name
+    check_if_correct(keys_history, k, text, points)
+
+def main():
+    text: str = 'the majestic eagle soared gracefully through the cloud-streaked sky, its powerful wings slicing through the air with effortless precision.'
+    keys_history = []
+    points = []
+    # get_terminal_size()
+    terminal_GUI(text)
+    listener = keyboard.Listener(on_press=lambda key: key_pressed(key, keys_history, text, points))
+    listener.start()
+    listener.join()
+
+if __name__ == "__main__":
+    main()
