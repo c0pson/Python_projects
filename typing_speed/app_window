@@ -1,59 +1,55 @@
-from pynput import keyboard
-import os
+import customtkinter as ctk
 
-class Color:
-    PURPLE = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    YELLOW = '\033[93m'
-    RED = '\033[91m'
-    END = '\033[0m'
+def destroy_old_page(page):
+    children = page.winfo_children()
+    children[-1].destroy()
 
-def get_terminal_size():
-    columns, rows = os.get_terminal_size()
-    os.system('cls')
-    print(f'Columns: {columns} | Rows: {rows}')
-
-def end_points(points):
-    print(points)
-
-def terminal_GUI(text: str):
-    print(f'\n\t{text}')
-
-def check_if_correct(keys_history, key, text, points):
-    if len(keys_history) == len(text):
-        end_points(points)
-        exit()
-    elif key == 'backspace':
+def listener(event, keys_history, label_1, check, text):
+    characters = [  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
+                    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                    '1', '2', '3', '4', '5', '6', '7', '8', '9', '0' ]
+    if (event.keysym).lower() in characters:
+        keys_history.append(event.keysym)
+        create_check_mark(check, 'green')
+    elif event.keysym == 'space':
+        keys_history.append(' ')
+        create_check_mark(check, 'green')
+    elif event.keysym == 'period':
+        keys_history.append('.')
+        create_check_mark(check, 'green')
+    elif event.keysym == 'BackSpace' and len(keys_history):
         keys_history.pop()
-    elif text[len(keys_history)].lower() == ' ' and key == 'space':
-        keys_history.append(key)
-        points.append(1)
-    elif text[len(keys_history)].lower() == key:
-        keys_history.append(key)
-        points.append(1)
-    else:
-        keys_history.append(key)
-        points.append(0)
+        destroy_old_page(check)
+    elif event.keysym in characters or event.keysym == 'space' or event.keysym == 'period':
+        create_check_mark(check, 'red')
+    label_1.configure(text=f'{''.join(keys_history)}')
 
-def key_pressed(key, keys_history, text, points):
-    if key == keyboard.Key.esc:
-        exit()
-    try:
-        k = key.char
-    except AttributeError:
-        k = key.name
-    check_if_correct(keys_history, k, text, points)
+def create_check_mark(check, color):
+    label = ctk.CTkFrame(master=check, width=9, height=3, fg_color=color)
+    label.pack(side='left', padx=2)
 
 def main():
-    text: str = 'the majestic eagle soared gracefully through the cloud-streaked sky, its powerful wings slicing through the air with effortless precision.'
+    app = ctk.CTk()
+    app.geometry('1080x720')
+    font_x21 = ctk.CTkFont(family='JetBrains Mono Regular', size=21)
+    text_text = 'Long text written for testing app 123.'
     keys_history = []
-    points = []
-    # get_terminal_size()
-    terminal_GUI(text)
-    listener = keyboard.Listener(on_press=lambda key: key_pressed(key, keys_history, text, points))
-    listener.start()
-    listener.join()
+
+    frame = ctk.CTkFrame(master=app)
+    frame.pack(side='top', anchor='center', expand=True)
+
+    label = ctk.CTkLabel(master=frame, text=text_text, font=font_x21)
+    label.pack(side='top', anchor='w', pady=10)
+
+    label_1 = ctk.CTkLabel(master=frame, text='' , font=font_x21)
+    label_1.pack(side='top', anchor='w', pady=2)
+
+    check = ctk.CTkFrame(master=frame, height=5)
+    check.pack(side='bottom', fill='x')
+
+    app.bind('<Key>', lambda event: listener(event, keys_history, label_1, check, text_text))
+
+    app.mainloop()
 
 if __name__ == "__main__":
     main()
