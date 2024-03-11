@@ -143,7 +143,8 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
 def main():
     app = ctk.CTk()
     app.geometry('1080x720')
-    app.title('TYPE')
+    app.title('')
+    app.iconbitmap('logo.ico')
     app.configure(fg_color =Color.MAIN)
     all_times = [0]
     avarge_accuracy = [0]
