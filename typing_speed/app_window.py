@@ -1,3 +1,4 @@
+from ctypes import windll, byref, sizeof, c_int 
 from wonderwords import RandomSentence
 import customtkinter as ctk
 from enum import Enum
@@ -140,12 +141,25 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
                                             app, points, wps_label, all_times, avarge_accuracy,
                                             score_label, speed_save, accuracy_save, next_text, current_sentance))
 
+def move_window(event, app):
+    app.geometry('+{0}+{1}'.format(event.x_root, event.y_root))
+
+def close_app(app):
+    app.destroy()
+
 def main():
     app = ctk.CTk()
     app.geometry('1080x720')
     app.title('')
     app.iconbitmap('logo.ico')
     app.configure(fg_color =Color.MAIN)
+
+    # colorized title bar
+    HWND = windll.user32.GetParent(app.winfo_id())
+    DWMWA_CAPTION_COLOR = 35
+    COLOR_1 = 0x00433034 # not equicalent to fg color in rest of the code idk why
+    windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_CAPTION_COLOR, byref(c_int(COLOR_1)), sizeof(c_int))    
+
     all_times = [0]
     avarge_accuracy = [0]
     speed_save = [0]
@@ -153,6 +167,7 @@ def main():
     next_text = RandomSentence().sentence()
     current_sentance = RandomSentence().sentence()
     load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance)
+
     app.mainloop()
 
 if __name__ == "__main__":
