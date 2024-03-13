@@ -100,6 +100,34 @@ def create_check_mark(check, color):
     label = ctk.CTkFrame(master=check, width=18, height=5, fg_color=color, corner_radius=0)
     label.pack(side='left')
 
+def close_menu_frame(frame, app):
+    frame.destroy()
+    app.bind('<Escape>', lambda event: quit_fullscreen(event, app))
+
+def menu_label(app, font_x30):
+    frame = ctk.CTkFrame(master=app, fg_color=Color.MAIN)
+    frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
+
+    option_menu = ctk.CTkFrame(master=frame, fg_color=Color.FR_1)
+    option_menu.pack(side='top', anchor='center', expand=True, padx=40, pady=30)
+
+    button_1 = ctk.CTkButton(master=option_menu, text='RESUME', fg_color=Color.FR_2,
+                            hover=False, text_color=Color.TEXT, font=font_x30, 
+                            command= lambda: close_menu_frame(frame, app))
+    button_1.pack(side='top', padx=10, pady=10, fill='x')
+
+    button_2 = ctk.CTkButton(master=option_menu, text='STATISTICS', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
+    button_2.pack(side='top', padx=10, pady=10, fill='x')
+
+    button_3 = ctk.CTkButton(master=option_menu, text='TIME CHALLENGE', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
+    button_3.pack(side='top', padx=10, pady=10, fill='x')
+
+    button_4 = ctk.CTkButton(master=option_menu, text='SHOW SESSION DURATION', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
+    button_4.pack(side='top', padx=10, pady=10, fill='x')
+
+    button_5 = ctk.CTkButton(master=option_menu, text='QUIT', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
+    button_5.pack(side='top', padx=10, pady=10, fill='x')
+
 def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance):
     font_x30 = ctk.CTkFont(family='JetBrains Mono Regular', size=30)
     font_x21 = ctk.CTkFont(family='JetBrains Mono Regular', size=21)
@@ -137,28 +165,40 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
     check = ctk.CTkFrame(master=frame, height=5, fg_color=Color.FR_2)
     check.pack(side='bottom', padx=5, pady=5, fill='x')
 
+    menu_frame = ctk.CTkFrame(master=app, fg_color=Color.FR_1)
+    menu_frame.pack(side='bottom', fill='x', padx=10, pady=10)
+
+    menu_button = ctk.CTkButton(master=menu_frame, fg_color=Color.FR_2, hover=False, text_color=Color.TEXT,
+                                text='≡', font=font_x30, anchor='n', width=60, command= lambda: menu_label(app, font_x30))
+    menu_button.pack(side='right', padx=10, pady=10)
+
     app.bind('<Key>', lambda even: listener(even, keys_history, label_1, check, current_sentance, typ_time,
                                             app, points, wps_label, all_times, avarge_accuracy,
                                             score_label, speed_save, accuracy_save, next_text, current_sentance))
 
-def move_window(event, app):
-    app.geometry('+{0}+{1}'.format(event.x_root, event.y_root))
+def bar_color(app):
+    HWND = windll.user32.GetParent(app.winfo_id())
+    DWMWA_CAPTION_COLOR = 35
+    COLOR_1 = 0x00433034 # not equicalent to fg color in rest of the code idk why
+    windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_CAPTION_COLOR, byref(c_int(COLOR_1)), sizeof(c_int)) 
 
-def close_app(app):
-    app.destroy()
+def quit_fullscreen(event, app):
+    app.attributes('-fullscreen', False)
+    bar_color(app)
+
+def go_fullscreen(event, app):
+    app.attributes('-fullscreen', True)
 
 def main():
     app = ctk.CTk()
     app.geometry('1080x720')
+    app.minsize(1080, 720)
     app.title('')
     app.iconbitmap('logo.ico')
     app.configure(fg_color =Color.MAIN)
+    # app.attributes('-fullscreen', True)
 
-    # colorized title bar
-    HWND = windll.user32.GetParent(app.winfo_id())
-    DWMWA_CAPTION_COLOR = 35
-    COLOR_1 = 0x00433034 # not equicalent to fg color in rest of the code idk why
-    windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_CAPTION_COLOR, byref(c_int(COLOR_1)), sizeof(c_int))    
+    bar_color(app)
 
     all_times = [0]
     avarge_accuracy = [0]
@@ -166,7 +206,11 @@ def main():
     accuracy_save = [0]
     next_text = RandomSentence().sentence()
     current_sentance = RandomSentence().sentence()
+
     load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance)
+
+    app.bind('<Escape>', lambda event: quit_fullscreen(event, app))
+    app.bind('<F11>', lambda event: go_fullscreen(event, app))
 
     app.mainloop()
 
