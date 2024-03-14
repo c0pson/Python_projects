@@ -26,11 +26,13 @@ def destroy_old_pages(page):
 def update_labels(typ_time, all_times, text, wps_label, points, avarge_accuracy, score_label, accuracy_save, speed_save):
     if typ_time[0] != 0:
         typ_time[1] = time.time()
+    # time
     all_times.append(len(text)/(5.1*(typ_time[1] - typ_time[0]))*60)
     avarge_time = 0
     for item in all_times:
         avarge_time += item
-    wps_label.configure(text=f'SPEED: {round((avarge_time / len(all_times)), 2)} WPM')
+    wps_label.configure(text=f'SPEED: {round((avarge_time / (len(all_times)-1)), 2)} WPM')
+    # accuraccy 
     accuracy = 0
     for item in points:
         accuracy += item
@@ -39,8 +41,9 @@ def update_labels(typ_time, all_times, text, wps_label, points, avarge_accuracy,
     for item in avarge_accuracy:
         av_accuracy += item
     score_label.configure(text=f'ACCURACY: {round((av_accuracy / (len(avarge_accuracy)-1)*100), 2)}%')
+    # save
     accuracy_save[0] = round((av_accuracy / (len(avarge_accuracy)-1)*100), 2)
-    speed_save[0] = round((avarge_time / len(all_times)), 2)
+    speed_save[0] = round((avarge_time / (len(all_times)-1)), 2)
     save_results(accuracy_save[0], speed_save[0])
 
 def listener(event, keys_history, label_1, check, text, typ_time, app,
@@ -154,7 +157,7 @@ def plot_from_database(app, menu, all_times, avarge_accuracy, speed_save, accura
     font_x40 = ctk.CTkFont(family='JetBrains Mono Regular', size=30)
 
     destroy_old_pages(app)
-    create_plot(app)
+    app.after(501, lambda: create_plot(app))
 
     frame = ctk.CTkFrame(master=app, fg_color=Color.MAIN)
     frame.pack(side='bottom', fill='x')
@@ -192,7 +195,7 @@ def menu_label(app, font_x30, menu, all_times, avarge_accuracy, speed_save, accu
     frame = ctk.CTkFrame(master=app, fg_color='#49425A')
     frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=0.5, relheight=0.5)
 
-    option_menu = ctk.CTkFrame(master=frame, fg_color=Color.FR_1)
+    option_menu = ctk.CTkFrame(master=frame, fg_color='#49425A')
     option_menu.pack(side='top', anchor='center', expand=True, padx=40, pady=30)
 
     button_1 = ctk.CTkButton(master=option_menu, text='RESUME', fg_color=Color.FR_2,
@@ -277,11 +280,10 @@ def main():
     app = ctk.CTk()
     app.geometry(f'1080x720+{app.winfo_screenmmwidth()//2+150}+{app.winfo_screenmmheight()//2}')
     app.minsize(1080, 720)
-    app.title('')
+    app.title('Typing speed test')
     app.iconbitmap('logo.ico')
     app.configure(fg_color =Color.MAIN)
-    # app.attributes('-fullscreen', True)
-
+    app.attributes('-fullscreen', True)
     bar_color(app)
 
     all_times = [0]
