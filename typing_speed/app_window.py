@@ -1,5 +1,7 @@
-from ctypes import windll, byref, sizeof, c_int 
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from ctypes import windll, byref, sizeof, c_int
 from wonderwords import RandomSentence
+from matplotlib.figure import Figure
 import customtkinter as ctk
 from enum import Enum
 import time
@@ -112,14 +114,79 @@ def save_results(time_consumed, accuracy):
     with open('statistics.txt', 'a') as file:
         file.write(f'{time_consumed}, {accuracy}\n')
 
-def plot_from_database():
-    # here will be plot showing users statistics
-    ...
+def read_data_from_file(filename):
+    x_values = []
+    y1_values = []
+    y2_values = []
+    with open(filename, 'r') as file:
+        for i, line in enumerate(file):
+            y1, y2 = map(float, line.split(','))
+            x_values.append(i)
+            y1_values.append(y1)
+            y2_values.append(y2)
+    return x_values, y1_values, y2_values
+
+def create_plot(app):
+    fig = Figure(figsize=(5, 4), dpi=100, facecolor=Color.MAIN)
+    subplot = fig.add_subplot(111)
+    x, y1, y2 = read_data_from_file('statistics.txt')
+    subplot.clear()
+    subplot.plot(x, y1, label='Accuracy', color=Color.GREEN)
+    subplot.plot(x, y2, label='WPM', color=Color.RED)
+    subplot.set_xlabel('', color=Color.GREEN)
+    subplot.set_ylabel('', color=Color.GREEN)
+    subplot.set_facecolor(Color.MAIN)
+    subplot.grid(True, color=Color.GRAY)
+    for spine in subplot.spines.values():
+        spine.set_edgecolor(Color.TEXT)
+    subplot.tick_params(axis='x', colors=Color.TEXT)
+    subplot.tick_params(axis='y', colors=Color.TEXT)
+    canvas = FigureCanvasTkAgg(fig, master=app)
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=ctk.TOP, fill=ctk.BOTH, expand=1)
+
+def quit_stats(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu):
+    destroy_old_pages(app)
+    load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu)
+
+def plot_from_database(app, menu, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time):
+    menu[0] = 1
+    font_x40 = ctk.CTkFont(family='JetBrains Mono Regular', size=30)
+
+    destroy_old_pages(app)
+    create_plot(app)
+
+    frame = ctk.CTkFrame(master=app, fg_color=Color.MAIN)
+    frame.pack(side='bottom', fill='x')
+
+    space1 = ctk.CTkLabel(master=frame, text='\t')
+    space1.pack(side='left')
+
+    legend_1 = ctk.CTkLabel(master=frame, text='📉', text_color=Color.TEXT, font=font_x40)
+    legend_1.pack(side='left')
+    legend_2 = ctk.CTkLabel(master=frame, text='Accuracy', text_color=Color.TEXT, font=font_x40)
+    legend_2.pack(side='left')
+    legend_5 = ctk.CTkLabel(master=frame, text='─', text_color=Color.GREEN, font=font_x40)
+    legend_5.pack(side='left', padx=10)
+
+    space = ctk.CTkLabel(master=frame, text='\t\t')
+    space.pack(side='left')
+
+    legend_3 = ctk.CTkLabel(master=frame, text='📈', text_color=Color.TEXT, font=font_x40)
+    legend_3.pack(side='left')
+    legend_4 = ctk.CTkLabel(master=frame, text='Speed', text_color=Color.TEXT, font=font_x40)
+    legend_4.pack(side='left')
+    legend_6 = ctk.CTkLabel(master=frame, text='─', text_color=Color.RED, font=font_x40)
+    legend_6.pack(side='left', padx=10)
+
+    button = ctk.CTkButton(master=frame, text='EXIT', text_color=Color.TEXT, fg_color=Color.FR_1, hover_color=Color.FR_2, font=font_x40,
+                            command=lambda: quit_stats(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu))
+    button.pack(side='right', anchor='s', padx=10, pady=20)
 
 def exit_app(app):
     app.destroy()
 
-def menu_label(app, font_x30, menu):
+def menu_label(app, font_x30, menu, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time):
     menu[0] = 1
 
     frame = ctk.CTkFrame(master=app, fg_color='#49425A')
@@ -133,24 +200,20 @@ def menu_label(app, font_x30, menu):
                             command= lambda: close_menu_frame(frame, app, menu))
     button_1.pack(side='top', padx=10, pady=10, fill='x')
 
-    button_2 = ctk.CTkButton(master=option_menu, text='STATISTICS', fg_color=Color.FR_2, hover=False,
-                            text_color=Color.TEXT, font=font_x30)
-    button_2.pack(side='top', padx=10, pady=10, fill='x') # graphs to display in tkinter
+    button_2 = ctk.CTkButton(master=option_menu, text='STATISTICS', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30,
+                            command=lambda: plot_from_database(app, menu, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time))
+    button_2.pack(side='top', padx=10, pady=10, fill='x')
 
-    button_3 = ctk.CTkButton(master=option_menu, text='TIME CHALLENGE', fg_color=Color.FR_2, hover=False,
-                            text_color=Color.TEXT, font=font_x30)
-    button_3.pack(side='top', padx=10, pady=10, fill='x') # implement timed session
-
-    button_4 = ctk.CTkButton(master=option_menu, text='QUIT', fg_color=Color.FR_2, hover=False,
+    button_3 = ctk.CTkButton(master=option_menu, text='QUIT', fg_color=Color.FR_2, hover=False,
                             text_color=Color.TEXT, font=font_x30, command=lambda: exit_app(app))
-    button_4.pack(side='top', padx=10, pady=10, fill='x')
+    button_3.pack(side='top', padx=10, pady=10, fill='x')
 
 def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu):
     font_x30 = ctk.CTkFont(family='JetBrains Mono Regular', size=30)
     font_x21 = ctk.CTkFont(family='JetBrains Mono Regular', size=21)
     points = []
     keys_history = []
-    typ_time = [0, 0]
+    typ_time = [time.time(), 0]
 
     top_frame = ctk.CTkFrame(master=app, fg_color=Color.FR_1)
     top_frame.pack(side='top', fill='x', padx=10, pady=10)
@@ -189,7 +252,8 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
     menu_frame.pack(side='bottom', fill='x', padx=10, pady=10)
 
     menu_button = ctk.CTkButton(master=menu_frame, fg_color=Color.FR_2, hover=False, text_color=Color.TEXT,
-                                text='≡', font=font_x30, anchor='n', width=60, command= lambda: menu_label(app, font_x30, menu))
+                                text='≡', font=font_x30, anchor='n', width=60,
+                                command= lambda: menu_label(app, font_x30, menu, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time))
     menu_button.pack(side='right', padx=5, pady=5)
 
     app.bind('<Key>', lambda even: listener(even, keys_history, label_1, check, current_sentance, typ_time, app,
@@ -199,7 +263,7 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
 def bar_color(app):
     HWND = windll.user32.GetParent(app.winfo_id())
     DWMWA_CAPTION_COLOR = 35
-    COLOR_1 = 0x00433034 # not equicalent to fg color in rest of the code idk why
+    COLOR_1 = 0x00433034
     windll.dwmapi.DwmSetWindowAttribute(HWND, DWMWA_CAPTION_COLOR, byref(c_int(COLOR_1)), sizeof(c_int)) 
 
 def quit_fullscreen(event, app):
@@ -211,7 +275,7 @@ def go_fullscreen(event, app):
 
 def main():
     app = ctk.CTk()
-    app.geometry('1080x720')
+    app.geometry(f'1080x720+{app.winfo_screenmmwidth()//2+150}+{app.winfo_screenmmheight()//2}')
     app.minsize(1080, 720)
     app.title('')
     app.iconbitmap('logo.ico')
@@ -226,8 +290,8 @@ def main():
     accuracy_save = [0]
     menu = [0]
     starting_time = time.time()
-    next_text = RandomSentence().sentence()
-    current_sentance = RandomSentence().sentence()
+    next_text = RandomSentence().sentence().replace('The', 'and')
+    current_sentance = RandomSentence().sentence().replace('.', ',')
 
     load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu)
 
