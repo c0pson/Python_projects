@@ -39,10 +39,13 @@ def update_labels(typ_time, all_times, text, wps_label, points, avarge_accuracy,
     score_label.configure(text=f'ACCURACY: {round((av_accuracy / (len(avarge_accuracy)-1)*100), 2)}%')
     accuracy_save[0] = round((av_accuracy / (len(avarge_accuracy)-1)*100), 2)
     speed_save[0] = round((avarge_time / len(all_times)), 2)
+    save_results(accuracy_save[0], speed_save[0])
 
 def listener(event, keys_history, label_1, check, text, typ_time, app,
             points, wps_label, all_times, avarge_accuracy, score_label,
-            speed_save, accuracy_save, next_text, current_sentance):
+            speed_save, accuracy_save, next_text, current_sentance, starting_time, menu):
+    if menu[0] == 1:
+        return
     if len(keys_history) == 0:
         typ_time[0] = time.time()
     characters = [  'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 
@@ -53,7 +56,7 @@ def listener(event, keys_history, label_1, check, text, typ_time, app,
         current_sentance = next_text
         next_text = RandomSentence().sentence()
         destroy_old_pages(app)
-        load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance)
+        load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu)
         return
     if event.keysym == 'BackSpace' and len(keys_history):
         keys_history.pop()
@@ -97,38 +100,52 @@ def listener(event, keys_history, label_1, check, text, typ_time, app,
     label_1.configure(text=f'{''.join(keys_history)}')
 
 def create_check_mark(check, color):
-    label = ctk.CTkFrame(master=check, width=18, height=5, fg_color=color, corner_radius=0)
-    label.pack(side='left')
+    label = ctk.CTkFrame(master=check, width=18, height=5, fg_color=color, corner_radius=0, bg_color=color)
+    label.pack(side='left', padx=0)
 
-def close_menu_frame(frame, app):
+def close_menu_frame(frame, app, menu):
     frame.destroy()
     app.bind('<Escape>', lambda event: quit_fullscreen(event, app))
+    menu[0] = 0
 
-def menu_label(app, font_x30):
-    frame = ctk.CTkFrame(master=app, fg_color=Color.MAIN)
-    frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=1, relheight=1)
+def save_results(time_consumed, accuracy):
+    with open('statistics.txt', 'a') as file:
+        file.write(f'{time_consumed}, {accuracy}\n')
+
+def plot_from_database():
+    # here will be plot showing users statistics
+    ...
+
+def exit_app(app):
+    app.destroy()
+
+def menu_label(app, font_x30, menu):
+    menu[0] = 1
+
+    frame = ctk.CTkFrame(master=app, fg_color='#49425A')
+    frame.place(relx=0.5, rely=0.5, anchor='center', relwidth=0.5, relheight=0.5)
 
     option_menu = ctk.CTkFrame(master=frame, fg_color=Color.FR_1)
     option_menu.pack(side='top', anchor='center', expand=True, padx=40, pady=30)
 
     button_1 = ctk.CTkButton(master=option_menu, text='RESUME', fg_color=Color.FR_2,
                             hover=False, text_color=Color.TEXT, font=font_x30, 
-                            command= lambda: close_menu_frame(frame, app))
+                            command= lambda: close_menu_frame(frame, app, menu))
     button_1.pack(side='top', padx=10, pady=10, fill='x')
 
-    button_2 = ctk.CTkButton(master=option_menu, text='STATISTICS', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
-    button_2.pack(side='top', padx=10, pady=10, fill='x')
+    button_2 = ctk.CTkButton(master=option_menu, text='STATISTICS', fg_color=Color.FR_2, hover=False,
+                            text_color=Color.TEXT, font=font_x30)
+    button_2.pack(side='top', padx=10, pady=10, fill='x') # graphs to display in tkinter
 
-    button_3 = ctk.CTkButton(master=option_menu, text='TIME CHALLENGE', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
-    button_3.pack(side='top', padx=10, pady=10, fill='x')
+    button_3 = ctk.CTkButton(master=option_menu, text='TIME CHALLENGE', fg_color=Color.FR_2, hover=False,
+                            text_color=Color.TEXT, font=font_x30)
+    button_3.pack(side='top', padx=10, pady=10, fill='x') # implement timed session
 
-    button_4 = ctk.CTkButton(master=option_menu, text='SHOW SESSION DURATION', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
+    button_4 = ctk.CTkButton(master=option_menu, text='QUIT', fg_color=Color.FR_2, hover=False,
+                            text_color=Color.TEXT, font=font_x30, command=lambda: exit_app(app))
     button_4.pack(side='top', padx=10, pady=10, fill='x')
 
-    button_5 = ctk.CTkButton(master=option_menu, text='QUIT', fg_color=Color.FR_2, hover=False, text_color=Color.TEXT, font=font_x30)
-    button_5.pack(side='top', padx=10, pady=10, fill='x')
-
-def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance):
+def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu):
     font_x30 = ctk.CTkFont(family='JetBrains Mono Regular', size=30)
     font_x21 = ctk.CTkFont(family='JetBrains Mono Regular', size=21)
     points = []
@@ -143,6 +160,9 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
 
     wps_label = ctk.CTkLabel(master=top_frame, text=f'SPEED: {speed_save[0]} WPM', font=font_x21, text_color=Color.TEXT)
     wps_label.pack(side='right', anchor='ne', padx=20, pady=10)
+
+    space_label = ctk.CTkLabel(master=app, text='\n\n')
+    space_label.pack(side='top')
 
     frame_for_frame = ctk.CTkFrame(master=app, fg_color=Color.MAIN)
     frame_for_frame.pack(anchor='center', expand=True, pady=10, padx=40, fill='x')
@@ -169,12 +189,12 @@ def load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, ne
     menu_frame.pack(side='bottom', fill='x', padx=10, pady=10)
 
     menu_button = ctk.CTkButton(master=menu_frame, fg_color=Color.FR_2, hover=False, text_color=Color.TEXT,
-                                text='≡', font=font_x30, anchor='n', width=60, command= lambda: menu_label(app, font_x30))
-    menu_button.pack(side='right', padx=10, pady=10)
+                                text='≡', font=font_x30, anchor='n', width=60, command= lambda: menu_label(app, font_x30, menu))
+    menu_button.pack(side='right', padx=5, pady=5)
 
-    app.bind('<Key>', lambda even: listener(even, keys_history, label_1, check, current_sentance, typ_time,
-                                            app, points, wps_label, all_times, avarge_accuracy,
-                                            score_label, speed_save, accuracy_save, next_text, current_sentance))
+    app.bind('<Key>', lambda even: listener(even, keys_history, label_1, check, current_sentance, typ_time, app,
+                                            points, wps_label, all_times, avarge_accuracy, score_label, speed_save,
+                                            accuracy_save, next_text, current_sentance, starting_time, menu))
 
 def bar_color(app):
     HWND = windll.user32.GetParent(app.winfo_id())
@@ -204,10 +224,12 @@ def main():
     avarge_accuracy = [0]
     speed_save = [0]
     accuracy_save = [0]
+    menu = [0]
+    starting_time = time.time()
     next_text = RandomSentence().sentence()
     current_sentance = RandomSentence().sentence()
 
-    load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance)
+    load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu)
 
     app.bind('<Escape>', lambda event: quit_fullscreen(event, app))
     app.bind('<F11>', lambda event: go_fullscreen(event, app))
