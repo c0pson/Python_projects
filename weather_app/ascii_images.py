@@ -16,7 +16,7 @@ def _01d():
 │     /   \     │
 ╰───────────────╯
 '''
-    print(ascii_clear)
+    return ascii_clear
 
 def _02d():
     # few clouds
@@ -29,7 +29,7 @@ def _02d():
 │               │
 ╰───────────────╯
 '''
-    print(ascii_few_clouds)
+    return ascii_few_clouds
 
 def _03d():
     # scattered clouds
@@ -42,20 +42,20 @@ def _03d():
 │               │
 ╰───────────────╯
 '''
-    print(ascii_scattered_clouds)
+    return ascii_scattered_clouds
 
 def _04d():
     # broken clouds
     ascii_broken_clouds = r'''
 ╭───────────────╮
-│         .--.  │
-│      .-(    ) │
+│       .--.    │
+│    .-(    ).  │
 │  .(___.__)__) │
 │ (_.__)__)     │
 │               │
 ╰───────────────╯
 '''
-    print(ascii_broken_clouds)
+    return ascii_broken_clouds
 
 def _09d():
     # shower rain
@@ -68,7 +68,7 @@ def _09d():
 │  ' ' ' ' '    │
 ╰───────────────╯
 '''
-    print(ascii_shower_rain)
+    return ascii_shower_rain
 
 def _10d():
     # rain
@@ -81,7 +81,7 @@ def _10d():
 │    ' ' ' '    │
 ╰───────────────╯
 '''
-    print(ascii_rain)
+    return ascii_rain
 
 def _11d():
     # thunderstorm
@@ -94,7 +94,7 @@ def _11d():
 │     ϟ   ϟ     │
 ╰───────────────╯
 '''
-    print(ascii_thunderstorm)
+    return ascii_thunderstorm
 
 def _13d():
     # snow
@@ -107,7 +107,7 @@ def _13d():
 │  * * * * *    │
 ╰───────────────╯
 '''
-    print(ascii_snow)
+    return ascii_snow
 
 def _50d():
     # mist
@@ -120,7 +120,7 @@ def _50d():
 │  __ == ==-=   │
 ╰───────────────╯
 '''
-    print(ascii_mist)
+    return ascii_mist
 
 def _01n():
     # clear sky
@@ -133,7 +133,7 @@ def _01n():
 │     '.__/     │
 ╰───────────────╯
 '''
-    print(ascii_clear_sky)
+    return ascii_clear_sky
 
 def _02n():
     # few clods
@@ -146,7 +146,7 @@ def _02n():
 │               │
 ╰───────────────╯
 '''
-    print(ascii_few_clouds)
+    return ascii_few_clouds
 
 def _03n():
     # scattered_clouds
@@ -159,19 +159,19 @@ def _03n():
 │               │
 ╰───────────────╯
 '''
-    print(ascii_scattered_clouds)
+    return ascii_scattered_clouds
 
 def _04n():
     ascii_broken_clouds = r'''
 ╭───────────────╮
-│         .--.  │
-│      .-(    ) │
+│       .--.    │
+│    .-(    ).  │
 │  .(___.__)__) │
 │ (_.__)__)     │
 │               │
 ╰───────────────╯
 '''
-    print(ascii_broken_clouds)
+    return ascii_broken_clouds
 
 def _09n():
     ascii_shower_rain = r'''
@@ -183,7 +183,7 @@ def _09n():
 │  ' ' ' ' '    │
 ╰───────────────╯
 '''
-    print(ascii_shower_rain)
+    return ascii_shower_rain
 
 def _10n():
     ascii_rain = r'''
@@ -195,20 +195,20 @@ def _10n():
 │    ' ' ' '    │
 ╰───────────────╯
       '''
-    print(ascii_rain)
+    return ascii_rain
 
 def _11n():
     # thunderstorm
     ascii_thunderstorm = r'''
-╭───────────────╮    
+╭───────────────╮
 │      .--.-.   │
 │   .-(    )_)  │
 │  (___.__)__)  │
 │   ϟ   ϟ   ϟ   │
 │     ϟ   ϟ     │
-╰───────────────╯    
+╰───────────────╯   
 '''
-    print(ascii_thunderstorm)
+    return ascii_thunderstorm
 
 def _13n():
     # snow
@@ -221,7 +221,7 @@ def _13n():
 │  * * * * *    │
 ╰───────────────╯
 '''
-    print(ascii_snow)
+    return ascii_snow
 
 def _50n():
     # mist
@@ -234,4 +234,4 @@ def _50n():
 │  __ == ==-=   │
 ╰───────────────╯
 '''
-    print(ascii_mist)
+    return ascii_mist
