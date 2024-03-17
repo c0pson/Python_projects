@@ -44,7 +44,6 @@ def print_weather(icon, city, weather, temp, feel_temp, humidity, rain_vol):
     lines[6] += f'│ {rain_vol}{' '*(29-len(str(rain_vol)))}││' # type: ignore
     lines[7] +=  '╰──────────────────────────────╯│'
 
-    os.system('cls')
     print(time_and_location, end='')
     for i, item in enumerate(lines):
         if i != len(lines)-1:
