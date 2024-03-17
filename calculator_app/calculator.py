@@ -75,9 +75,7 @@ def handle_plus_operator(input_text, history_list, operation):
     numbers = input_text.get().replace('−', '-')
     history_list.append(numbers)
     input_text.delete('0', 'end')
-    print(history_list)
     operation[0] = '+'
-    print(operation)
 
 def handle_solution_operator(input_text, history_list, operation):
     if not history_list[0]:
@@ -86,8 +84,8 @@ def handle_solution_operator(input_text, history_list, operation):
         history_list.append(input_text.get())
     else:
         return
-    history_list[0] = int(history_list[0])
-    history_list[1] = int(history_list[1])
+    history_list[0] = float(history_list[0])
+    history_list[1] = float(history_list[1])
     if operation[0] == '-':
         solution = history_list[0] - history_list[1]
     if operation[0] == '+':
@@ -96,19 +94,21 @@ def handle_solution_operator(input_text, history_list, operation):
         solution = history_list[0] / history_list[1]
     if operation[0] == 'x':
         solution = history_list[0] * history_list[1]
-    print(solution)
     input_text.delete('0', 'end')
-    input_text.insert('0', str(solution))
-    history_list[0] = str(solution)
-    history_list.pop()
+    history_list = []
     input_text.xview_moveto(len(input_text.get()))
+    if solution == int(solution):
+        solution = int(solution)
+        input_text.insert('0', str(solution))
+    else:
+        input_text.insert('0', str(solution))
 
 def numbers_keyboard(app, screen_frame):
     history_list = []
     operation = ['']
     font_x21 = ctk.CTkFont(family='JetBrains Mono', size=21)
-    font_x42 = ctk.CTkFont(family='JetBrains Mono', size=42)
-    input_text = ctk.CTkEntry(master=screen_frame, font=font_x42, justify='right', insertofftime=99999)
+    font_x62 = ctk.CTkFont(family='JetBrains Mono', size=62)
+    input_text = ctk.CTkEntry(master=screen_frame, font=font_x62, justify='right', insertofftime=99999)
     input_text.pack(fill='x')
     frame = ctk.CTkFrame(master=app)
     frame.pack(side='left', fill='both', expand=True)
