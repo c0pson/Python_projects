@@ -55,16 +55,17 @@ class App(ctk.CTk):
         super().__init__(fg_color=Colors.MAIN)
         self.geometry('1080x720')
         self.title('Mouse training')
+        ctk.deactivate_automatic_dpi_awareness()
 
-        self.top_frame = ctk.CTkFrame(self, height=100)
+        self.top_frame = ctk.CTkFrame(self,fg_color=Colors.MAIN)
         self.top_frame.pack(side='top', fill='x')
+
         self.frame = ctk.CTkFrame(master=self)
         self.frame.pack(fill='both', expand=True)
-        self.after(100, self.create_button)
 
-    def create_button(self):
-        butto1 = target_button(self.frame, '', (40, 40))
-
-if __name__ == "__main__":
+def main():
     app = App()
     app.mainloop()
+
+if __name__ == "__main__":
+    main()
