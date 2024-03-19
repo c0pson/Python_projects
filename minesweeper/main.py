@@ -136,7 +136,7 @@ def player_moves(board_size):
 def mark_bomb(board, x_cord, y_cord):
     if board[x_cord - 1][y_cord - 1] == 'B':
         board[x_cord - 1][y_cord - 1] = 'M'
-    elif board[x_cord - 1][x_cord - 1] == 'X':
+    elif board[x_cord - 1][y_cord - 1] == 'X':
         board[x_cord - 1][y_cord - 1] = 'm'
     else:
         print('U cant mark bomb in here!')
