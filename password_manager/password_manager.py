@@ -674,9 +674,9 @@ def display_error(app, my_font, my_text):
     space = 0
     if my_text == 'Wrong Password':
         color = Colors.BLUE_BACKGROUND
-        space = 250
+        space = 100
     else:
-        space = 150
+        space = 50
     frame_for_error = ctk.CTkFrame(master=app, fg_color=Colors.RED, border_color=Colors.GRAPHITE, border_width=3, width=200, height=(half_height // 10), bg_color=color)
     label = ctk.CTkLabel(master=frame_for_error, text=my_text, font=my_font, text_color=Colors.GRAPHITE)
     frame_for_error.place(x=half_width-space, y=half_height // 12)
