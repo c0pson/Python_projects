@@ -13,7 +13,8 @@ class Colors(str, Enum):
 def update_score(points, time_delta, score_label_list, time_betwean_list):
     score_label_list[0].configure(text=f'Score: {points[0]}')
     time_delta = round(time_delta, 2) if len(str(round(time_delta, 2))) >= 4 else str(round(time_delta, 2)) + '0'
-    time_betwean_list[0].configure(text=f'Time {time_delta} s')
+    if float(time_delta) <= 2:
+        time_betwean_list[0].configure(text=f'Time: {time_delta} s')
 
 def points_label(app, points, score_label_list, time_history, time_betwean_list):
     score_frame = ctk.CTkFrame(master=app, height=100, fg_color=Colors.MAIN)
