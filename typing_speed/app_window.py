@@ -27,7 +27,7 @@ def update_labels(typ_time, all_times, text, wps_label, points, avarge_accuracy,
     if typ_time[0] != 0:
         typ_time[1] = time.time()
     # time
-    all_times.append(len(text)/(5.1*(typ_time[1] - typ_time[0]))*60)
+    all_times.append(len(text)/(5.1*(typ_time[1] - typ_time[0]))*30)
     avarge_time = 0
     for item in all_times:
         avarge_time += item
@@ -294,6 +294,7 @@ def main():
     starting_time = time.time()
     next_text = RandomSentence().sentence().replace('The', 'and')
     current_sentance = RandomSentence().sentence().replace('.', ',')
+    ctk.deactivate_automatic_dpi_awareness()
 
     load_new_game(app, all_times, avarge_accuracy, speed_save, accuracy_save, next_text, current_sentance, starting_time, menu)
 

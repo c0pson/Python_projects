@@ -23,7 +23,7 @@ def input_info(ask: str) -> str:
     return user_input
 
 def show_path(user_input: str) -> None:
-    if not os.path.isabs(user_input):
+    if os.path.isabs(user_input) != '':
         dirname = os.path.dirname(__file__)
         print(f'Your file is saved in: {dirname}\\{user_input}')
     else:
@@ -56,7 +56,7 @@ def print_ascii_art(luminance_data: list[int]) -> None:
 def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
     characters: list[str] = ['#', '$', '&', '%', '!', '+', '"', '=', '\'', '_', '-', '.', ' ']
     line_list: list[str] = []
-    with open(path_to_save, 'a') as file:
+    with open(path_to_save, 'w') as file:
         for item in luminance_data:
             if item != 9999:
                 index = int(item // 13)
@@ -67,7 +67,7 @@ def save_to_file(luminance_data: list[int], path_to_save: str) -> None:
     show_path(path_to_save)
 
 def main() -> None:
-    img_path = image_path('3113740-4046895436.jpg')
+    img_path = image_path(input_info('Enter path to image'))
     details = convert_to_int(input_info('Insert number from 1 to 100'), 'Insert number from 1 to 100')
     luminance_data: list[int] = get_luminace(img_path, details)
     os.system('cls')
