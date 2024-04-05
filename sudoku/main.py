@@ -20,6 +20,8 @@ class Board(ctk.CTkFrame):
         self.check_button = ctk.CTkButton(master=master, text='CHECK', command=self.check_board)
         self.check_button.pack(side='bottom', padx=10, pady=10)
 
+        self.print_board()
+
         self.pack(side='top', padx=10, pady=10, anchor='center', expand=True)
 
     def cell_keyboard_input_handle(self, event):
@@ -161,7 +163,27 @@ class Board(ctk.CTkFrame):
                 is_good.append(1)
             columns = []
         if 0 in is_good:
-            print('u good bro?')
+            return False
+        for i in range(len(self.all_cells)):
+            if self.all_cells[i].cget('text') == '   ':
+                print('not ready yet')
+                return False
+        return True
+
+    def print_board(self):
+        with open('sudoku\\boards.txt', 'r') as file:
+            lines = file.readlines()
+            lines_ = []
+            for i in range(1, 10):
+                lines_.append(lines[i])
+            multi = 0
+            for i in range(9):
+                if i%3 == 0 and i != 0:
+                    multi += 2
+                for j in range(9):
+                    index = j + (6*(j//3)) + (i*3) + (9*multi)
+                    if lines_[i][j] != '0':
+                        self.all_cells[index].configure(text=lines_[i][j])
 
 class App(ctk.CTk):
     def __init__(self):
