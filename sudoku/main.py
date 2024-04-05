@@ -6,6 +6,7 @@ class Colors(str, Enum):
     BACK = '#F5F7F8'
     INCO = '#F4CE14'
     BUT1 = '#495E57'
+    BUT2 = '#5F726C'
     TEXT = '#45474B'
 
 class Board(ctk.CTkFrame):
@@ -14,6 +15,7 @@ class Board(ctk.CTkFrame):
         master.bind('<Key>', self.cell_keyboard_input_handle)
         self.selected_cell = None
         self.all_cells = []
+        self.banned_cells = []
 
         self.create_board()
 
@@ -28,7 +30,7 @@ class Board(ctk.CTkFrame):
         accepted_input = '1234567890'
         if not self.selected_cell:
             pass
-        elif event.keysym in accepted_input:
+        elif event.keysym in accepted_input and self.selected_cell not in self.banned_cells:
             self.selected_cell.configure(text=f'{event.keysym}')
         self.move_on_board(event)
 
@@ -86,7 +88,10 @@ class Board(ctk.CTkFrame):
             if not x:
                 return
             if self.selected_cell:
-                self.selected_cell.configure(fg_color=Colors.TEXT)
+                if self.selected_cell not in self.banned_cells:
+                    self.selected_cell.configure(fg_color=Colors.TEXT)
+                else:
+                    self.selected_cell.configure(fg_color=Colors.BUT2)
                 self.all_cells[board_ids[x-1][y]].configure(fg_color=Colors.BUT1)
                 self.selected_cell = self.all_cells[board_ids[x-1][y]]
         if event.keysym == 'Down' or event.keysym == 's':
@@ -95,7 +100,10 @@ class Board(ctk.CTkFrame):
             if x > 7:
                 return
             if self.selected_cell:
-                self.selected_cell.configure(fg_color=Colors.TEXT)
+                if self.selected_cell not in self.banned_cells:
+                    self.selected_cell.configure(fg_color=Colors.TEXT)
+                else:
+                    self.selected_cell.configure(fg_color=Colors.BUT2)
                 self.all_cells[board_ids[x+1][y]].configure(fg_color=Colors.BUT1)
                 self.selected_cell = self.all_cells[board_ids[x+1][y]]
         if event.keysym == 'Left' or event.keysym == 'a':
@@ -104,7 +112,10 @@ class Board(ctk.CTkFrame):
             if not y:
                 return
             if self.selected_cell:
-                self.selected_cell.configure(fg_color=Colors.TEXT)
+                if self.selected_cell not in self.banned_cells:
+                    self.selected_cell.configure(fg_color=Colors.TEXT)
+                else:
+                    self.selected_cell.configure(fg_color=Colors.BUT2)
                 self.all_cells[board_ids[x][y-1]].configure(fg_color=Colors.BUT1)
                 self.selected_cell = self.all_cells[board_ids[x][y-1]]
         if event.keysym == 'Right' or event.keysym == 'd':
@@ -113,9 +124,14 @@ class Board(ctk.CTkFrame):
             if y > 7:
                 return
             if self.selected_cell:
-                self.selected_cell.configure(fg_color=Colors.TEXT)
+                if self.selected_cell not in self.banned_cells:
+                    self.selected_cell.configure(fg_color=Colors.TEXT)
+                else:
+                    self.selected_cell.configure(fg_color=Colors.BUT2)
                 self.all_cells[board_ids[x][y+1]].configure(fg_color=Colors.BUT1)
                 self.selected_cell = self.all_cells[board_ids[x][y+1]]
+        if self.selected_cell in self.banned_cells:
+            self.selected_cell.configure(fg_color=Colors.BUT2)
 
     # TODO: detect which is incorrect | in next version - now just basics
     # alghoritm was made for fun | kinda unpractical but was fun to make
@@ -183,7 +199,8 @@ class Board(ctk.CTkFrame):
                 for j in range(9):
                     index = j + (6*(j//3)) + (i*3) + (9*multi)
                     if lines_[i][j] != '0':
-                        self.all_cells[index].configure(text=lines_[i][j])
+                        self.all_cells[index].configure(text=lines_[i][j], fg_color=Colors.BUT2)
+                        self.banned_cells.append(self.all_cells[index])
 
 class App(ctk.CTk):
     def __init__(self):
