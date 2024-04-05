@@ -171,7 +171,6 @@ class App(ctk.CTk):
         if event.keysym == 'BackSpace' and len(prev) > 1:
             self.guesses_list[self.current_index].configure(text=f'{prev[:-2].upper()}')
         if len(prev) > 10 and event.keysym == 'Return' and self.is_word(prev.replace(' ', '')):
-            print(self.word)
             self.check_letters(prev.replace(' ', '').lower())
 
     def is_word(self, word):

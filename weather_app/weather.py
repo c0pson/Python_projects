@@ -3,7 +3,6 @@ from api_code import API
 import ascii_images
 import requests
 import time
-import os
 
 def print_weather(icon, city, weather, temp, feel_temp, humidity, rain_vol):
     function_map = {
@@ -78,7 +77,7 @@ def get_request():
         else:
             rain_vol = ''
         print_weather(icon, city, weather, temp, feel_temp, humidity, rain_vol)
-    elif response.status_code == 400:
+    else:
         print('NOT FOUND!')
 
 def main():
